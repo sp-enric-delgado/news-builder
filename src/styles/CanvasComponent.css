@@ -1,0 +1,19 @@
+.canvasSection{
+    display: flex;
+    flex-direction: column;
+
+    padding: 3rem;
+
+    justify-content: center;
+    align-items: center; 
+
+    width: 100%;
+
+    border: 3px solid green;
+}
+
+.canvasDiv{
+    display: inline-block;
+    width: auto;
+    height: auto;
+}

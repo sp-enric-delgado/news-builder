@@ -1,0 +1,12 @@
+.content{
+    padding: 3rem;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    width: 100%;
+
+    border: 3px solid red;
+}
