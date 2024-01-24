@@ -23,26 +23,30 @@ function CanvasComponent({AppImageCollection}) {
     // PROCESS INCOMING IMAGE(S)
     function processImageCollection(imageCollection){
         if(canvas ===  null) return;
-        
-        for(let i = 0; i < imageCollection.length; i++){
-            const image = imageCollection[i];
-            addImageToCanvas(image[0], image[1]);
+
+        console.log(imageCollection)
+        for(const [id, image] of Object.entries(imageCollection)){
+            addImageToCanvas(image, id === "background");
         }
 
-        console.log('Canvas objects: ' + canvas.getObjects());
+        canvas.renderAll();
     }
 
     // ADD IMAGE TO CANVAS
     function addImageToCanvas(imageFile, isBackground){
-        try{
-            fabric.Image.fromURL(URL.createObjectURL(imageFile), (img) => {
-                const imageIndex = isBackground ? 0 : -1;
-                img.set({ left: 0, top: 0, scaleX: 1, scaleY: 1, selectable: false });
-                canvas.remove(canvas.item(imageIndex));
-                canvas.insertAt(img, imageIndex).renderCanvas.bind(canvas);
+        const imageURL = URL.createObjectURL(imageFile);
+        canvas.clear();
 
+        try{
+            const imageIndex = isBackground ? 0 : -1;
+
+            fabric.Image.fromURL(imageURL, (img) => {
                 if(isBackground) resizeCanvas(img);
+                img.set({ left: 0, top: 0, scaleX: 1, scaleY: 1, selectable: !isBackground });
+                canvas.insertAt(img, imageIndex).renderCanvas.bind(canvas);
+                console.log("ADDING IMAGE TO CANVAS: " + img);
             });
+
             } catch (error) { console.log("COULDN'T ADD IMAGE TO CANVAS: " + error); }
     }
 
