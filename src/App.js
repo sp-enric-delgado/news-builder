@@ -4,6 +4,7 @@ import axios from 'axios';
 import './styles/App.css'
 import CanvasComponent from './components/CanvasComponent.js';
 import ImageFormComponent from './components/ImageFormComponent.js';
+import DropdownComponent from './components/DropdownComponent.js';
 
 function App(){
   const [composition, setComposition] = useState([]);
@@ -15,8 +16,14 @@ function App(){
       </div>
       
       <div className='pageBody'>
-        <ImageFormComponent OnCollectionUpdated={setComposition}/>
-        <CanvasComponent AppImageCollection={composition}/> 
+        <div className='pageBody-left'>
+          <CanvasComponent AppImageCollection={composition}/> 
+        </div>
+
+        <div className='pageBody-right'>
+          <DropdownComponent/>
+          <ImageFormComponent OnCollectionUpdated={setComposition}/>
+        </div>
       </div>
     </div>
   );

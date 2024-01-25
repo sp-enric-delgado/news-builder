@@ -5,7 +5,20 @@
 
 .pageBody{
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
 
     justify-content: space-between;
+}
+
+.pageBody-left{
+    width: 100%;
+}
+
+.pageBody-right{
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    border: 3px solid blue;
 }

@@ -5,8 +5,8 @@ import axios from 'axios';
 import '../styles/CanvasComponent.css'
 
 function CanvasComponent({AppImageCollection}) {
-    const [backgroundWidth, setBackgroundWidth] = useState(512);
-    const [backgroundHeight, setBackgroundHeight] = useState(512);
+    const [backgroundWidth, setBackgroundWidth] = useState(0);
+    const [backgroundHeight, setBackgroundHeight] = useState(0);
 
     const [canvas, setCanvas] = useState(null);
     const canvasRef = useRef();
