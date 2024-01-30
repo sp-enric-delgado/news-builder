@@ -1,0 +1,19 @@
+.code-editor-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+}
+
+.code-editor {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    width: 100%;
+    max-width: 600px;
+    height: 400px;
+    overflow: auto;
+    font-size: 16px;
+    line-height: 1.5;
+    tab-size: 2;
+}

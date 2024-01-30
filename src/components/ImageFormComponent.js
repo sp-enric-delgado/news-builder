@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/ImageFormComponent.css'
 
 /*
     TO BE DONE:
 
-    - Create "Template Dropdown": dropdown that alows you to choose between different configurations
-    
     - Dynamically add input fields depending on the loaded configuration 
     
     - Have placeholder images depending on the configuration
 */
 
-function ImageFormComponent({OnCollectionUpdated}) {
+function ImageFormComponent({Template, OnCollectionUpdated}) {
 
     const [imageCollection, updateImageCollection] = useState({});
+    const [inputFields, setInputFields] = useState([]);
 
     function handleImageUpload(event){
         const uploadedImageFile = event.target.files[0];
@@ -26,6 +25,27 @@ function ImageFormComponent({OnCollectionUpdated}) {
         
         updateImageCollection(newCollection);
     }
+
+    useEffect(() => {
+        if (Template) {
+          const inputFields = [];
+          for (const [id, config] of Object.entries(Template)) {
+            inputFields.push(
+              <div key={id}>
+                <label htmlFor={id}>{config.name}</label>
+                <input
+                  id={id}
+                  type={config.type}
+                  placeholder={config.placeholder}
+                  value={imageCollection[id] || ""}
+                  onChange={(event) => handleImageUpload(event, id)}
+                />
+              </div>
+            );
+          }
+          setInputFields(inputFields);
+        }
+      }, [Template]);
 
     return (
         <div className='content'>
