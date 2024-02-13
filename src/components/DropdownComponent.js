@@ -4,7 +4,7 @@ import { IoIosArrowDropdown } from "react-icons/io";
 import '../styles/DropdownComponent.css'
 import LoadTemplateModal from './Modal/LoadTemplateModal';
 
-function DropdownComponent({OnTemplateUploaded, OnSelectedTemplate}) {
+function DropdownComponent({OnSelectedTemplate}) {
     const [isOpen, setIsOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState('');
@@ -30,7 +30,6 @@ function DropdownComponent({OnTemplateUploaded, OnSelectedTemplate}) {
             ADDS THE NEW UPLOADED FILE TO THE OPTIONS LIST
         */
         setNewTemplate(newUploadedTemplate);
-        OnTemplateUploaded(newTemplate);
     };
 
     const toggleDropdown = () => {
@@ -56,7 +55,6 @@ function DropdownComponent({OnTemplateUploaded, OnSelectedTemplate}) {
             );
         });
     }
-    
 
     return (
         <div className="dropdown-container">
@@ -75,8 +73,6 @@ function DropdownComponent({OnTemplateUploaded, OnSelectedTemplate}) {
                     <div className="options-container">
                         {displayCurrentTemplates()}
                     </div>
-
-
                 </div>
             )}
 

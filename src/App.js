@@ -8,12 +8,7 @@ import DropdownComponent from './components/DropdownComponent.js';
 
 function App(){
   const [composition, setComposition] = useState([]);
-  const [templates, setTemplates] = useState([]);
   const [currentTemplate, setCurrentTemplate] = useState();
-
-  function handleTemplateUpload(uploadedTemplate) {
-    setTemplates(prevTemplates => [...prevTemplates, uploadedTemplate]);
-  }
 
   return (
     <div className='page'>
@@ -27,7 +22,7 @@ function App(){
         </div>
 
         <div className='pageBody-right'>
-          <DropdownComponent OnTemplateUploaded={handleTemplateUpload} OnSelectedTemplate={setCurrentTemplate} />
+          <DropdownComponent OnSelectedTemplate={setCurrentTemplate} />
           <ImageFormComponent Template={currentTemplate} OnCollectionUpdated={setComposition}/>
         </div>
       </div>
