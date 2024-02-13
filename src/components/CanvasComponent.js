@@ -44,7 +44,6 @@ function CanvasComponent({AppImageCollection}) {
                 if(isBackground) resizeCanvas(img);
                 img.set({ left: 0, top: 0, scaleX: 1, scaleY: 1, selectable: !isBackground });
                 canvas.insertAt(img, imageIndex).renderCanvas.bind(canvas);
-                console.log("ADDING IMAGE TO CANVAS: " + img);
             });
 
             } catch (error) { console.log("COULDN'T ADD IMAGE TO CANVAS: " + error); }
@@ -59,11 +58,17 @@ function CanvasComponent({AppImageCollection}) {
         canvasDivRef.current.style.height = `${backgroundImage.height}px`;
     }
 
-    // AXIOS IMAGE PROCESS
+    // IMAGE PROCESS
     //      - Current Purpose: downloading the composed image
     //      - Future Purpose: uploading it to the AM
     function handleProcessImages(){
-        // TO BE DONE
+        if (canvas) {
+            const dataURL = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'test';
+            a.click();
+        }
     }
 
     return(

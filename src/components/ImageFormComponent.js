@@ -39,7 +39,6 @@ function ImageFormComponent({Template, OnCollectionUpdated}) {
             <h1>{Template}</h1>
             {
               templateContent[0].map((item, index) => {
-                console.log(item.name);
                 return(
                   <div key={index}>
                     <h3>{item.name}</h3>
