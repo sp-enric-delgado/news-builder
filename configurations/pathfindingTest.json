@@ -1,0 +1,15 @@
+[
+    {
+        "name": "ML Pathselling Test",
+        "content": [
+            {
+                "name": "Background",
+                "id": "background"
+            },
+            {
+                "name": "Foreground Monster",
+                "id": "upload-image-1"
+            }
+        ]
+    }
+]

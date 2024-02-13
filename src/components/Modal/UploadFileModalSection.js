@@ -26,11 +26,10 @@ function UploadFileModalSection({onDrop}) {
       const file = files[0];
       const reader = new FileReader();
 
-      reader.onload = event => {
-        onDrop(event.target.result);
-      };
+      reader.addEventListener("load", (event) => {
+        onDrop(JSON.parse(reader.result));
+      });
 
-      debugger;
       reader.readAsText(file);
     }
   };

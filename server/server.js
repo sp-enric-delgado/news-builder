@@ -2,18 +2,58 @@
 
 const express = require('express');
 const http = require('http');
-const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');
+const fileSystem = require('fs');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
-const port = 3001;
+const port = 3000;
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use(express.static('../public'));
+
+const updateTemplates = (newTemplate) => {
+  fileSystem.readFile('../public/templates.json', (error, data) => {
+    if (error) {
+      console.error(error);
+      return false;
+    }
+
+    let templates;
+    try {
+      templates = JSON.parse(data);
+    } catch (error) {
+      console.error('Error parsing templates.json:', error);
+      return false;
+    }
+
+    templates.push(newTemplate);
+
+    fileSystem.writeFile('../public/templates.json', JSON.stringify(templates, null, 2), (error) => {
+      if (error) {
+        console.error('Error writing templates.json:', error);
+        return false;
+      }
+
+      return true;
+    });
+  });
+};
+
+app.post('/templates', (req, res) => {
+  const template = req.body;
+  const success = updateTemplates(template);
+  if (success) {
+    res.status(200).send('TEMPLATE SAVED SUCCESSFULLY');
+  } else {
+    res.status(500).send('ERROR SAVING TEMPLATE');
+  }
+});
+
+/* IMAGEMAGICK STUFF */
 app.post('/processImages', (req, res) => {
   const { backgroundPath, images } = req.body;
 
@@ -30,20 +70,6 @@ app.post('/processImages', (req, res) => {
       console.log(`Images processed successfully: ${stdout}`);
       res.json({ success: true, message: 'Images processed successfully', imagePath: outputPath});
     }
-  });
-});
-
-wss.on('connection', (ws) => {
-  console.log('WebSocket connected');
-
-  // You can send real-time updates to connected clients here
-  // For simplicity, let's assume the server sends a dummy message every 2 seconds
-  const interval = setInterval(() => {
-    ws.send('Real-time update from the server');
-  }, 2000);
-
-  ws.on('close', () => {
-    clearInterval(interval);
   });
 });
 

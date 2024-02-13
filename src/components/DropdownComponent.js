@@ -1,16 +1,36 @@
-import { useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { IoIosArrowDropdown } from "react-icons/io";
 
-import LoadTemplateModal from './Modal/LoadTemplateModal';
 import '../styles/DropdownComponent.css'
+import LoadTemplateModal from './Modal/LoadTemplateModal';
 
-function DropdownComponent({Templates, OnTemplateUpload}) {
+function DropdownComponent({OnTemplateUploaded, OnSelectedTemplate}) {
     const [isOpen, setIsOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedOption, setSelectedOption] = useState('');
+    const [newTemplate, setNewTemplate] = useState('');
+    const [currentTemplates, setCurrentTemplates] = useState([]);
 
-    const handleLoadTemplates = () => {
-        OnTemplateUpload(Templates);
+    useEffect(() => {
+        /* EACH TIME A NEW TEMPLATE IS ADDED, RUN THROUGH THEM ALL AND COLLECT THEIR NAMES */
+        fetch('/templates.json').
+        then((response) => response.json()).
+        then((data) => {
+            const templateNames = data.map((item) => item.name);
+            setCurrentTemplates(templateNames);
+        })
+        .catch((error) => console.error('ERROR GETTING TEMPLATES FOR DROPDOWN: ' + error));
+    }, [newTemplate]);
+
+    const handleLoadedTemplate = (newUploadedTemplate) => {
+        /*
+            FILE VERIFICATION HAS TO BE INCLUDED
+
+            THIS LAUNCHES WHEN THE UPLOAD BUTTON OF THE MODAL HAS BEEN PRESSED
+            ADDS THE NEW UPLOADED FILE TO THE OPTIONS LIST
+        */
+        setNewTemplate(newUploadedTemplate);
+        OnTemplateUploaded(newTemplate);
     };
 
     const toggleDropdown = () => {
@@ -23,8 +43,20 @@ function DropdownComponent({Templates, OnTemplateUpload}) {
 
     const handleOptionClick = (option) => {
         setSelectedOption(option);
+        OnSelectedTemplate(option);
         setIsOpen(false);
     };
+
+    function displayCurrentTemplates(){
+        return currentTemplates.map((name, index) => {
+            return (
+            <ul>
+                <li key={index} className="option" onClick={() => handleOptionClick(name)}>{name}</li>
+            </ul>
+            );
+        });
+    }
+    
 
     return (
         <div className="dropdown-container">
@@ -41,11 +73,7 @@ function DropdownComponent({Templates, OnTemplateUpload}) {
                     </div>
                     
                     <div className="options-container">
-                        {Templates.map((template, index) => (
-                            <div key={index} className="option" onClick={() => handleOptionClick(template)}>
-                                {template.name}
-                            </div>
-                        ))}
+                        {displayCurrentTemplates()}
                     </div>
 
 
@@ -53,7 +81,7 @@ function DropdownComponent({Templates, OnTemplateUpload}) {
             )}
 
             {isModalOpen && (
-                <LoadTemplateModal setOpenModal={setIsModalOpen} onTemplateUpload={handleLoadTemplates}/>
+                <LoadTemplateModal setOpenModal={setIsModalOpen} onNewTemplateAdded={handleLoadedTemplate}/>
             )}
         </div>
     );
