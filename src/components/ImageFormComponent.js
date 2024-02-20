@@ -7,7 +7,7 @@ function ImageFormComponent({Template, OnCollectionUpdated}) {
     const [templateContent, setTemplateContent] = useState([]);
 
     useEffect(() => {
-      fetch('templates.json')
+      fetch('http://localhost:3001/templates')
       .then((response) => response.json())
       .then((data) => {
         const currentTemplate = data.filter((item) => item.name === Template);

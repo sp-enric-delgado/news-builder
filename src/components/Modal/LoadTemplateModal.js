@@ -6,27 +6,20 @@ import '../../styles/Modal/LoadTemplateModal.css'
 
 function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
     
-    const [template, setTemplate] = useState('');
+    const [template, setTemplate] = useState({});
 
-    useEffect(() => {
-        fetch('/templates.json')
+    /*useEffect(() => {
+        fetch('http://localhost:3001/templates')
         .then((response) => response.json())
-        .then((data) =>  setTemplate(data))
+        .then((data) =>  {
+            // console.log("SETTING TEMPLATE DATA: " + data);
+            setTemplate(data)
+        })
         .catch((error) => console.error('Error fetching input fields:', error));
-    }, []);
-
-    /*
-    useEffect(() => {
-        fetch('configurations.json')
-            .then(response => response.json())
-            .then(data => setTemplate(data));
-    }, [template]);
-    */
+    }, [template]);*/
 
     function handleDroppedFile(){
-        /*  CODE ARRIVES HERE AS EXPECTED  */
-        
-        // saveTemplate(template);
+        saveTemplate(template);
         onNewTemplateAdded(template);
         setOpenModal(false);
     }
@@ -34,7 +27,7 @@ function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
     /* HERE DO THE CODE CHECK AND UPLOAD TO SERVER */
     const saveTemplate = async (template) => {
         try{
-            const response = await fetch('/templates', {
+            const response = await fetch('http://localhost:3001/templates', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -44,6 +37,7 @@ function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
 
             if(response.ok){
                 console.log('TEMPLATE SAVED SUCCESSFULLY');
+                // fetch
             }
             else{
                 console.error('ERROR SAVING TEMPLATE');
@@ -52,6 +46,7 @@ function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
         catch(error){
             console.error('Error saving template: ', error);
         }
+        // debugger;
     }
 
 
@@ -67,10 +62,7 @@ function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
                 </div>
 
                 <div className='modal-content--uploadArea'>
-                    <UploadFileModalSection onDrop={() => {
-                        console.log("here should launch settemplate");
-                        /*setTemplate();*/
-                        }} />
+                    <UploadFileModalSection onDrop={setTemplate} />
                 </div>
 
                 <div className='modal-content--uploadButton'>

@@ -2,46 +2,70 @@
 
 const express = require('express');
 const http = require('http');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');
 const fileSystem = require('fs');
+const fileSystemPromises = require('fs').promises;
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
-const port = 3000;
+const port = 3001;
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+const dbPath = path.join(__dirname, '../server/db/templates.json');
 
-app.use(express.static('../public'));
+async function updateTemplates (newTemplate) {
+  const data = await fileSystemPromises.readFile(dbPath, "utf8");
+  const templates = JSON.parse(data);  
+  
+  // async (error, data) => {
+    // if (error) {
+    //   console.error("SERVER ERROR: " + error);
+    //   return false;
+    // }
 
-const updateTemplates = (newTemplate) => {
-  fileSystem.readFile('../public/templates.json', (error, data) => {
-    if (error) {
-      console.error(error);
-      return false;
-    }
-
-    let templates;
-    try {
-      templates = JSON.parse(data);
-    } catch (error) {
-      console.error('Error parsing templates.json:', error);
-      return false;
-    }
+    // let templates;
+    //try {
+    //  templates = JSON.parse(data);
+    // } catch (error) {
+    //  console.error('Error parsing templates.json: ', error);
+    //  return false;
+    // }
 
     templates.push(newTemplate);
 
-    fileSystem.writeFile('../public/templates.json', JSON.stringify(templates, null, 2), (error) => {
-      if (error) {
-        console.error('Error writing templates.json:', error);
-        return false;
-      }
+    fileSystem.writeFileSync(dbPath, JSON.stringify(templates, null, 2)); 
+    
+    return true;
+    //, (error) => {
+      // if (error) {
+      //  console.error('Error writing templates.json: ', error);
+      //  return false;
+      // }
 
-      return true;
-    });
-  });
+      // return true;
+    // });
+  // });
 };
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(express.static('db/'));
+
+app.get('/templates', async (req, res) => {
+  try
+  {
+    const data = await fileSystemPromises.readFile(dbPath, "utf8");
+    const templates = JSON.parse(data);
+    res.status(200).json(templates);
+  }
+  catch (error){
+    res.status(500).send('ERROR READING templates.json');
+  }
+});
 
 app.post('/templates', (req, res) => {
   const template = req.body;
@@ -49,7 +73,7 @@ app.post('/templates', (req, res) => {
   if (success) {
     res.status(200).send('TEMPLATE SAVED SUCCESSFULLY');
   } else {
-    res.status(500).send('ERROR SAVING TEMPLATE');
+    res.status(500).send('ERROR SAVING TEMPLATE AT LINE 119');
   }
 });
 
@@ -57,8 +81,6 @@ app.post('/templates', (req, res) => {
 app.post('/processImages', (req, res) => {
   const { backgroundPath, images } = req.body;
 
-  // Implement ImageMagick processing here
-  // Example: Combine background and images using 'composite' command
   const command = `composite -gravity center ${backgroundPath} ${images.map((img) => img.src).join(' ')} output.jpg`;
   const outputPath = path.join(__dirname, 'processed-images', 'output.jpg');
 

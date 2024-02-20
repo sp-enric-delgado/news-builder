@@ -13,9 +13,9 @@ function DropdownComponent({OnSelectedTemplate}) {
 
     useEffect(() => {
         /* EACH TIME A NEW TEMPLATE IS ADDED, RUN THROUGH THEM ALL AND COLLECT THEIR NAMES */
-        fetch('/templates.json').
-        then((response) => response.json()).
-        then((data) => {
+        fetch('http://localhost:3001/templates')
+        .then((response) => response.json())
+        .then((data) => {
             const templateNames = data.map((item) => item.name);
             setCurrentTemplates(templateNames);
         })
@@ -49,7 +49,7 @@ function DropdownComponent({OnSelectedTemplate}) {
     function displayCurrentTemplates(){
         return currentTemplates.map((name, index) => {
             return (
-            <ul>
+            <ul key={name}>
                 <li key={index} className="option" onClick={() => handleOptionClick(name)}>{name}</li>
             </ul>
             );
@@ -65,12 +65,12 @@ function DropdownComponent({OnSelectedTemplate}) {
             </div>
 
             {isOpen && (
-                <div className="dropdown-content">
-                    <div className="fixed-button-container">
-                        <button className="fixed-button" onClick={showModal}>Permanent Button</button>
+                <div key="uniqueID1" className="dropdown-content">
+                    <div key="uniqueID2" className="fixed-button-container">
+                        <button key="uniqueID3" className="fixed-button" onClick={showModal}>Load template</button>
                     </div>
                     
-                    <div className="options-container">
+                    <div key="uniqueID4" className="options-container">
                         {displayCurrentTemplates()}
                     </div>
                 </div>

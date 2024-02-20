@@ -27,7 +27,8 @@ function UploadFileModalSection({onDrop}) {
       const reader = new FileReader();
 
       reader.addEventListener("load", (event) => {
-        onDrop(JSON.parse(reader.result));
+        const result = JSON.parse(reader.result);
+        onDrop(result);
       });
 
       reader.readAsText(file);
