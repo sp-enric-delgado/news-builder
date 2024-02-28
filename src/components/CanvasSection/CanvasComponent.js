@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { fabric } from 'fabric';
 import axios from 'axios';
 
-import '../styles/CanvasComponent.css'
+import '../../styles/CanvasComponent.css'
 
 function CanvasComponent({AppImageCollection}) {
     const [backgroundWidth, setBackgroundWidth] = useState(0);

@@ -2,21 +2,11 @@ import { useState, useEffect } from 'react';
 import { ImCross } from "react-icons/im";
 
 import UploadFileModalSection from './UploadFileModalSection';
-import '../../styles/Modal/LoadTemplateModal.css'
+import '../../../styles/Modal/LoadTemplateModal.css'
 
 function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
     
     const [template, setTemplate] = useState({});
-
-    /*useEffect(() => {
-        fetch('http://localhost:3001/templates')
-        .then((response) => response.json())
-        .then((data) =>  {
-            // console.log("SETTING TEMPLATE DATA: " + data);
-            setTemplate(data)
-        })
-        .catch((error) => console.error('Error fetching input fields:', error));
-    }, [template]);*/
 
     function handleDroppedFile(){
         saveTemplate(template);
@@ -34,19 +24,10 @@ function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
                 },
                 body: JSON.stringify(template),
             });
-
-            if(response.ok){
-                console.log('TEMPLATE SAVED SUCCESSFULLY');
-                // fetch
-            }
-            else{
-                console.error('ERROR SAVING TEMPLATE');
-            }
         }
         catch(error){
             console.error('Error saving template: ', error);
         }
-        // debugger;
     }
 
 

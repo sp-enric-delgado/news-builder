@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BsFiletypeJson } from "react-icons/bs";
 
-import '../../styles/Modal/UploadFileModalSection.css';
+import '../../../styles/Modal/UploadFileModalSection.css';
 
 function UploadFileModalSection({onDrop}) {
   const [dragOver, setDragOver] = useState(false);

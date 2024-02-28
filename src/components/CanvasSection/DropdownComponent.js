@@ -1,7 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { IoIosArrowDropdown } from "react-icons/io";
 
-import '../styles/DropdownComponent.css'
+import '../../styles/DropdownComponent.css'
 import LoadTemplateModal from './Modal/LoadTemplateModal';
 
 function DropdownComponent({OnSelectedTemplate}) {

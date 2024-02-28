@@ -13,41 +13,9 @@ const app = express();
 const server = http.createServer(app);
 const port = 3001;
 
-const dbPath = path.join(__dirname, '../server/db/templates.json');
-
-async function updateTemplates (newTemplate) {
-  const data = await fileSystemPromises.readFile(dbPath, "utf8");
-  const templates = JSON.parse(data);  
-  
-  // async (error, data) => {
-    // if (error) {
-    //   console.error("SERVER ERROR: " + error);
-    //   return false;
-    // }
-
-    // let templates;
-    //try {
-    //  templates = JSON.parse(data);
-    // } catch (error) {
-    //  console.error('Error parsing templates.json: ', error);
-    //  return false;
-    // }
-
-    templates.push(newTemplate);
-
-    fileSystem.writeFileSync(dbPath, JSON.stringify(templates, null, 2)); 
-    
-    return true;
-    //, (error) => {
-      // if (error) {
-      //  console.error('Error writing templates.json: ', error);
-      //  return false;
-      // }
-
-      // return true;
-    // });
-  // });
-};
+const dbPath = path.join(__dirname, '../server/db');
+const templatesPath = path.join(dbPath, 'templates.json');
+const projectsPath = path.join(dbPath, 'projects.json');
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -55,10 +23,54 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static('db/'));
 
+// MANAGE PROJECTS
+async function updateProjects(newProject){
+  const data = await fileSystemPromises.readFile(projectsPath, "utf8");
+  const projects = JSON.parse(data);
+
+  projects.push(newProject);
+  fileSystem.writeFileSync(projectsPath, JSON.stringify(projects, null, 2));
+
+  return true;
+}
+
+app.get('/projects', async (req, res) => {
+  try{
+    const data = await fileSystemPromises.readFile(projectsPath, "utf8");
+    const projects = JSON.parse(data);
+    res.status(200).json(projects);
+  }
+  catch(error){
+    res.status(500).send('Error reading projects');
+  }
+});
+
+app.post('/projects', async(req, res) => {
+    const project = req.body;
+    const success = updateProjects(project);
+    if(success){
+      res.status(200).send('Project saved successfully');
+    }
+    else{
+      res.status(500).send('Error posting projects');
+    }
+});
+
+// MANAGE TEMPLATES
+async function updateTemplates (newTemplate) {
+  const data = await fileSystemPromises.readFile(templatesPath, "utf8");
+  const templates = JSON.parse(data);  
+  
+  templates.push(newTemplate);
+  fileSystem.writeFileSync(templatesPath, JSON.stringify(templates, null, 2)); 
+    
+  return true;
+};
+
 app.get('/templates', async (req, res) => {
   try
   {
-    const data = await fileSystemPromises.readFile(dbPath, "utf8");
+    const data = await fileSystemPromises.readFile(templatesPath, "utf8");
     const templates = JSON.parse(data);
     res.status(200).json(templates);
   }

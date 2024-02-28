@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/ImageFormComponent.css'
+import '../../styles/ImageFormComponent.css'
 
 function ImageFormComponent({Template, OnCollectionUpdated}) {
 
