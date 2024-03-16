@@ -31,6 +31,27 @@ async function updateProjects(newProject){
   projects.push(newProject);
   fileSystem.writeFileSync(projectsPath, JSON.stringify(projects, null, 2));
 
+  const templateFileName = newProject.name;
+  generateProjectTemplatesFile(templateFileName);
+
+  return true;
+}
+
+async function generateProjectTemplatesFile(projectName){
+  const projName = projectName.toLowerCase().replace(/\s+/g, '');
+  const templateFileName = `${projName}_templates.json`
+  const projectsTemplatePath = path.join(dbPath, templateFileName);
+
+  fileSystem.writeFileSync(projectsTemplatePath, JSON.stringify({
+    name: projectName,
+    content: [
+      {
+        name: "Upload Template to Start Creating",
+        id: "noID"
+      }
+    ]
+  }, null, 2));
+
   return true;
 }
 
