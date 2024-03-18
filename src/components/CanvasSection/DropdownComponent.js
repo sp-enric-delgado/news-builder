@@ -4,7 +4,7 @@ import { IoIosArrowDropdown } from "react-icons/io";
 import '../../styles/DropdownComponent.css'
 import LoadTemplateModal from './Modal/LoadTemplateModal';
 
-function DropdownComponent({OnSelectedTemplate, ProjectName}) {
+function DropdownComponent({ProjectName, OnSelectedTemplate}) {
     const [isOpen, setIsOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState('');

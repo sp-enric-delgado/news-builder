@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import '../../styles/ImageFormComponent.css'
 
-function ImageFormComponent({Template, OnCollectionUpdated}) {
+function ImageFormComponent({ProjectName, Template, OnCollectionUpdated}) {
 
     const [imageCollection, updateImageCollection] = useState({});
     const [templateContent, setTemplateContent] = useState([]);
 
     useEffect(() => {
-      fetch('http://localhost:3001/templates')
+      fetch(`http://localhost:3001/templates?projectName=${encodeURIComponent(ProjectName)}`)
       .then((response) => response.json())
       .then((data) => {
         const currentTemplate = data.filter((item) => item.name === Template);

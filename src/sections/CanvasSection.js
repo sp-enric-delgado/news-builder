@@ -26,8 +26,8 @@ function CanvasSection(){
         </div>
 
         <div className='pageBody-right'>
-          <DropdownComponent OnSelectedTemplate={setCurrentTemplate} ProjectName={projectName}/>
-          <ImageFormComponent Template={currentTemplate} OnCollectionUpdated={setComposition}/>
+          <DropdownComponent ProjectName={projectName}  OnSelectedTemplate={setCurrentTemplate}/>
+          <ImageFormComponent ProjectName={projectName} Template={currentTemplate} OnCollectionUpdated={setComposition}/>
         </div>
       </div>
     </div>
