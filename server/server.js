@@ -42,15 +42,7 @@ async function generateProjectTemplatesFile(projectName){
   const templateFileName = `${projName}_templates.json`
   const projectsTemplatePath = path.join(dbPath, templateFileName);
 
-  fileSystem.writeFileSync(projectsTemplatePath, JSON.stringify({
-    name: projectName,
-    content: [
-      {
-        name: "Upload Template to Start Creating",
-        id: "noID"
-      }
-    ]
-  }, null, 2));
+  fileSystem.writeFileSync(projectsTemplatePath, JSON.stringify([], null, 2));
 
   return true;
 }
@@ -89,9 +81,15 @@ async function updateTemplates (newTemplate) {
 };
 
 app.get('/templates', async (req, res) => {
+  const queryString = req.query;
+  const projectName = queryString.projectName;
+
+  if(projectName === null) return;
+
   try
   {
-    const data = await fileSystemPromises.readFile(templatesPath, "utf8");
+    const templatesFilePath = path.join(dbPath, `${projectName.toLowerCase().replace(/\s+/g, '')}_templates.json`)
+    const data = await fileSystemPromises.readFile(templatesFilePath, "utf8");
     const templates = JSON.parse(data);
     res.status(200).json(templates);
   }

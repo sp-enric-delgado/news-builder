@@ -6,10 +6,10 @@ import CreateProjectModal from "../components/ProjectSection/Modal/CreateProject
 function ProjectSection(){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [projects, setProjects] = useState([]);
-
     const navigate = useNavigate();
-    function navigateToCanvas(){
-        navigate("/canvas");
+
+    function navigateToCanvas(projectName){
+        navigate("/canvas", {state:{projectName}});
     }
 
     /* ON APP ENTER, FETCH AND LOAD PROJECTS */
@@ -63,7 +63,7 @@ function ProjectSection(){
                             projects.map((item, index) => {
                                 return(
                                     <li key={index} className="content-element">
-                                        <button key={item} className="content-element-button" onClick={navigateToCanvas}>{item}</button>
+                                        <button key={item} className="content-element-button" onClick={()=>navigateToCanvas(item)}>{item}</button>
                                     </li>
                                 );
                             })

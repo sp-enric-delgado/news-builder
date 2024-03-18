@@ -4,7 +4,7 @@ import { IoIosArrowDropdown } from "react-icons/io";
 import '../../styles/DropdownComponent.css'
 import LoadTemplateModal from './Modal/LoadTemplateModal';
 
-function DropdownComponent({OnSelectedTemplate}) {
+function DropdownComponent({OnSelectedTemplate, ProjectName}) {
     const [isOpen, setIsOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState('');
@@ -12,8 +12,7 @@ function DropdownComponent({OnSelectedTemplate}) {
     const [currentTemplates, setCurrentTemplates] = useState([]);
 
     useEffect(() => {
-        /* EACH TIME A NEW TEMPLATE IS ADDED, RUN THROUGH THEM ALL AND COLLECT THEIR NAMES */
-        fetch('http://localhost:3001/templates')
+        fetch(`http://localhost:3001/templates?projectName=${encodeURIComponent(ProjectName)}`)
         .then((response) => response.json())
         .then((data) => {
             const templateNames = data.map((item) => item.name);
