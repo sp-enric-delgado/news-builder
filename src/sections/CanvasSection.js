@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import '../styles/CanvasSection.css'
@@ -8,10 +8,29 @@ import DropdownComponent from '../components/CanvasSection/DropdownComponent.js'
 
 function CanvasSection(){
   const location = useLocation();
-  const [projectName, setProjectName] = useState(location.state.projectName);
+  const [projectName, setProjectName] = useState(location.state?.projectName);
   const [composition, setComposition] = useState([]);
   const [currentTemplate, setCurrentTemplate] = useState();
 
+  const [changedImage, setChangedImage] = useState({});
+  const [imageID, setImageID] = useState("");
+  const [imagePosition, setImagePosition] = useState({})
+
+  // THIS IS JUST FOR DEBUGGING -----------------------------------------------------------------
+  useEffect(() => {
+    if(imageID === "") return;
+    console.log("0.2. [CANVAS SECTION] ON REQUEST IMAGE POSITION IMG ID: " + imageID);
+  }, [imageID]);
+
+
+  useEffect(() => {
+    if(Object.keys(imagePosition).length === 0){
+      console.log("9. [CANVAS SECTION] IMAGE POSITION OBJ IS EMPTY");
+      return;
+    }
+    console.log("9. [CANVAS SECTION] POSITION RECIEVED FROM CANVAS COMPONENT: " + imagePosition);
+  }, [imagePosition]);
+  // --------------------------------------------------------------------------------------------
 
   return (
     <div className='page'>
@@ -22,12 +41,12 @@ function CanvasSection(){
       
       <div className='pageBody'>
         <div className='pageBody-left'>
-          <CanvasComponent AppImageCollection={composition}/> 
+          <CanvasComponent AppImageCollection={composition} OnImagePositionChanged={changedImage} OnImageIDRequested={imageID} OnSendImagePosition={setImagePosition}/> 
         </div>
 
         <div className='pageBody-right'>
           <DropdownComponent ProjectName={projectName}  OnSelectedTemplate={setCurrentTemplate}/>
-          <ImageFormComponent ProjectName={projectName} Template={currentTemplate} OnCollectionUpdated={setComposition}/>
+          <ImageFormComponent ProjectName={projectName} Template={currentTemplate} OnCollectionUpdated={setComposition} OnImagePositionChanged={setChangedImage} OnRetrieveImagePos={setImageID} OnImagePosRetrieved={imagePosition}/>
         </div>
       </div>
     </div>
