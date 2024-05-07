@@ -23,7 +23,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static('db/'));
 
-// MANAGE PROJECTS
+function parseProjName(projName){
+  return projName.toLowerCase().replace(/\s+/g, '');
+}
+
+// MANAGE PROJECTS ________________________________________________________
 async function updateProjects(newProject){
   const data = await fileSystemPromises.readFile(projectsPath, "utf8");
   const projects = JSON.parse(data);
@@ -38,7 +42,8 @@ async function updateProjects(newProject){
 }
 
 async function generateProjectTemplatesFile(projectName){
-  const projName = projectName.toLowerCase().replace(/\s+/g, '');
+  // const projName = projectName.toLowerCase().replace(/\s+/g, '');
+  const projName = parseProjName(projectName);
   const templateFileName = `${projName}_templates.json`
   const projectsTemplatePath = path.join(dbPath, templateFileName);
 
@@ -68,27 +73,32 @@ app.post('/projects', async(req, res) => {
       res.status(500).send('Error posting projects');
     }
 });
+//_________________________________________________________________________
 
-// MANAGE TEMPLATES
-async function updateTemplates (newTemplate) {
-  const data = await fileSystemPromises.readFile(templatesPath, "utf8");
+// MANAGE TEMPLATES _______________________________________________________
+async function updateTemplates (newTemplate, projectName) {
+  const projName = parseProjName(projectName);
+  const path = `${dbPath}/${projName}_templates.json`;
+
+  const data = await fileSystemPromises.readFile(path,  "utf8");
   const templates = JSON.parse(data);  
   
   templates.push(newTemplate);
-  fileSystem.writeFileSync(templatesPath, JSON.stringify(templates, null, 2)); 
-    
+  fileSystem.writeFileSync(path, JSON.stringify(templates, null, 2));
   return true;
 };
 
 app.get('/templates', async (req, res) => {
   const queryString = req.query;
-  const projectName = queryString.projectName;
+  // const projectName = queryString.projectName;
+  const projectName = parseProjName(queryString.projectName);
 
   if(projectName === null) return;
 
   try
   {
-    const templatesFilePath = path.join(dbPath, `${projectName.toLowerCase().replace(/\s+/g, '')}_templates.json`)
+    // const templatesFilePath = path.join(dbPath, `${projectName.toLowerCase().replace(/\s+/g, '')}_templates.json`)
+    const templatesFilePath = path.join(dbPath, `${projectName}_templates.json`)
     const data = await fileSystemPromises.readFile(templatesFilePath, "utf8");
     const templates = JSON.parse(data);
     res.status(200).json(templates);
@@ -100,7 +110,9 @@ app.get('/templates', async (req, res) => {
 
 app.post('/templates', (req, res) => {
   const template = req.body;
-  const success = updateTemplates(template);
+  const queryString = req.query;
+  const projectName = queryString.projectName;
+  const success = updateTemplates(template, projectName);
   if (success) {
     res.status(200).send('TEMPLATE SAVED SUCCESSFULLY');
   } else {

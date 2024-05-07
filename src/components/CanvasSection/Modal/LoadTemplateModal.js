@@ -4,9 +4,10 @@ import { ImCross } from "react-icons/im";
 import UploadFileModalSection from './UploadFileModalSection';
 import '../../../styles/Modal/LoadTemplateModal.css'
 
-function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
+function LoadTemplateModal({setOpenModal, onNewTemplateAdded, projectName}){
     
     const [template, setTemplate] = useState({});
+    //const [projectName, setProjectName] = useState('MYPROJECT');
 
     function handleDroppedFile(){
         saveTemplate(template);
@@ -17,7 +18,7 @@ function LoadTemplateModal({setOpenModal, onNewTemplateAdded}){
     /* HERE DO THE CODE CHECK AND UPLOAD TO SERVER */
     const saveTemplate = async (template) => {
         try{
-            const response = await fetch('http://localhost:3001/templates', {
+            const response = await fetch(`http://localhost:3001/templates?projectName=${projectName}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

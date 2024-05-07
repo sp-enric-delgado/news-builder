@@ -76,7 +76,7 @@ function DropdownComponent({ProjectName, OnSelectedTemplate}) {
             )}
 
             {isModalOpen && (
-                <LoadTemplateModal setOpenModal={setIsModalOpen} onNewTemplateAdded={handleLoadedTemplate}/>
+                <LoadTemplateModal setOpenModal={setIsModalOpen} onNewTemplateAdded={handleLoadedTemplate} projectName={ProjectName}/>
             )}
         </div>
     );

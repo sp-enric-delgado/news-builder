@@ -7,5 +7,51 @@
         "id": "noID"
       }
     ]
+  },
+  {
+    "name": "DC Dragon Tournament Test",
+    "content": [
+      {
+        "name": "Background",
+        "id": "background"
+      },
+      {
+        "name": "Dragon",
+        "id": "upload-image-1"
+      },
+      {
+        "name": "Dragon Overlay",
+        "id": "upload-image-2"
+      },
+      {
+        "name": "Rewards",
+        "id": "upload-image-3"
+      },
+      {
+        "name": "Frame",
+        "id": "upload-image-4"
+      }
+    ]
+  },
+  {
+    "name": "DC Chest Tournament Test",
+    "content": [
+      {
+        "name": "Background",
+        "id": "background"
+      },
+      {
+        "name": "Currency",
+        "id": "upload-image-1"
+      },
+      {
+        "name": "Currency Glow",
+        "id": "upload-image-2"
+      },
+      {
+        "name": "Chest",
+        "id": "upload-image-3"
+      }
+    ]
   }
 ]
