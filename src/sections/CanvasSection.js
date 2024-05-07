@@ -14,23 +14,7 @@ function CanvasSection(){
 
   const [changedImage, setChangedImage] = useState({});
   const [imageID, setImageID] = useState("");
-  const [imagePosition, setImagePosition] = useState({})
-
-  // THIS IS JUST FOR DEBUGGING -----------------------------------------------------------------
-  useEffect(() => {
-    if(imageID === "") return;
-    console.log("0.2. [CANVAS SECTION] ON REQUEST IMAGE POSITION IMG ID: " + imageID);
-  }, [imageID]);
-
-
-  useEffect(() => {
-    if(Object.keys(imagePosition).length === 0){
-      console.log("9. [CANVAS SECTION] IMAGE POSITION OBJ IS EMPTY");
-      return;
-    }
-    console.log("9. [CANVAS SECTION] POSITION RECIEVED FROM CANVAS COMPONENT: " + imagePosition);
-  }, [imagePosition]);
-  // --------------------------------------------------------------------------------------------
+  const [imagePosition, setImagePosition] = useState({});
 
   return (
     <div className='page'>

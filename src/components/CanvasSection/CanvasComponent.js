@@ -26,6 +26,12 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
     }, []);
 
     useEffect(() => {
+        canvas?.on('object:moving', function(event){
+            getImagePosition(event.target.id);
+        });
+    }, [canvas]);
+
+    useEffect(() => {
         if (canvas == null) return;
 
         canvas.setWidth(backgroundWidth);
@@ -42,7 +48,6 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
     }, [backgroundHeight]);
 
     useEffect(() => {
-        console.log("1. [CANVAS COMPONENT] APP IMAGE COLLECTION UPDATED!");
         processImageCollection(AppImageCollection);
     }, [AppImageCollection]);
 
@@ -55,11 +60,8 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
     }, [OnImageIDRequested])
 
     useEffect(() => {
-        if(imagePos === undefined) {    
-            console.log("8. [CANVAS COMPONENT] IMAGE POSITION IS UNDEFINED");
-            return;
-        }
-        console.log("8. [CANVAS COMPONENT] SENDING IMAGE POS: " + imagePos);
+        if(imagePos === undefined)  return; 
+        
         OnSendImagePosition(imagePos);
     }, [imagePos])
 
@@ -68,12 +70,9 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
     function processImageCollection(imageCollection){
         if(canvas ===  null) return;
 
-        console.log("2. [CANVAS COMPONENT] PROCESSING IMAGE COLLECTION...");
         for(const [id, image] of Object.entries(imageCollection)){
             addImageToCanvas(image, id);
         }
-
-        //canvas.renderAll();
     }
 
     async function fabricImageFromURL(image_url) {                                                                          
@@ -88,9 +87,7 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
         });                                                                                                                   
     }
 
-    // ADD IMAGE TO CANVAS
     async function addImageToCanvas(imageFile, imageID){
-        console.log("3. [CANVAS COMPONENT] ADDING IMAGES TO CANVAS...");
         const imageURL = URL.createObjectURL(imageFile);
         canvas.clear();
 
@@ -107,17 +104,11 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
 
             img.setOptions({ left: 0, top: 0, scaleX: 1, scaleY: 1, selectable: !isBackground, id: imageID});
 
-            console.log("4. [CANVAS COMPONENT] POPULATING CANVAS! ADDING IMAGE: " + img.id);
             canvas.insertAt(img, imageIndex);
-            // debugger;
-
             canvas.renderAll.bind(canvas);
 
-            // debugger;
+        } catch (error) { console.log("[CANVAS COMPONENT] COULDN'T ADD IMAGE TO CANVAS: " + error); }
 
-        } catch (error) { console.log("4. [CANVAS COMPONENT] COULDN'T ADD IMAGE TO CANVAS: " + error); }
-
-        console.log("5. [CANVAS COMPONENT] CANVAS POPULATED! CURRENT CANVAS IMAGES: " + canvas.getObjects().length)
         getImagePosition(imageID);
     }
 
@@ -136,27 +127,17 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
 
             if(imageObject.id === imageID)
             {
-                /* 
-                
-                TO DO
-                    - MAKE FORM DISPLAY CURRENT POS OF THE IMAGE
-                    - CHANGE AUTO REFLECTS ON IMAGE
-                    - FINE TUNE IMAGE SELECTION WHEN PARAMETRISING
-                    - HIGHLIGHT CURRENT SELECTED IMAGE
-                    
-                */
-
                 currentImage = imageObject;
 
-                const currentPosition = currentImage.getPointByOrigin('center', 'center');
+                const currentPosition = currentImage.getPointByOrigin('top', 'left');
 
                 xPos = xPos === null ? currentPosition.x : parseInt(xPos);
                 yPos = yPos === null ? currentPosition.y : parseInt(yPos);
                 
                 currentImage.setPositionByOrigin(
                     new fabric.Point(xPos, yPos),
-                    'center',
-                    'center'
+                    'top',
+                    'left'
                 );
 
                 canvas.renderAll();
@@ -167,33 +148,18 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
     function getImagePosition(imageID){
         if(canvas === null) return;
 
-        console.log("6. [CANVAS COMPONENT] GETTING IMAGE POS FOR ID: " + imageID);
-
         const canvasImages = canvas.getObjects();
-        // debugger;
 
-        if(canvasImages.length === 0) {
-            console.log("7. CANVAS COMPONENT] CANVAS IS EMTPY! CURRENT CANVAS IMAGES: " + canvasImages.length);
-            return;
-        }
-
-        //debugger;
+        if(canvasImages.length === 0) return; 
 
         canvasImages.map(imageObject => {
             if(imageObject.id === imageID)
             {
-                setImagePos(imageObject.getPointByOrigin('center', 'center'));
-                console.log("7. [CANVAS SECTION] IMAGE POS FOR " + imageID + " FOUND!: " + imagePos);
+                setImagePos({"id": imageID, "pos": imageObject.getPointByOrigin('center', 'center')});
             }
-            // else{
-            //     console.log("7. [CANVAS COMPONENT] IMAGE POSITION FOR " + imageID + " NOT FOUND!");
-            // }
         });
     }
 
-    // IMAGE PROCESS
-    //      - Current Purpose: downloading the composed image
-    //      - Future Purpose: uploading it to the AM
     function handleProcessImages(){
         if (canvas) {
             const dataURL = canvas.toDataURL('image/png');

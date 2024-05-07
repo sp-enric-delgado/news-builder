@@ -31,10 +31,14 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
     }, [Template])
 
     useEffect(() => {
-      console.log("10. [IMAGE FORM COMPONENT] IMAGE POSITION RETRIEVED! CALLING EVENT...");
+      // console.log("10. [IMAGE FORM COMPONENT] IMAGE POSITION RETRIEVED! CALLING EVENT...");
       const customPosEvent = new CustomEvent('onImagePosRetrieved', {detail: OnImagePosRetrieved});
       documentRef.current.dispatchEvent(customPosEvent);
     }, [OnImagePosRetrieved])
+
+    useEffect(() => {
+      OnImagePositionChanged(changesDictionary);
+    }, [changesDictionary])
 
     function handleImageUpload(event){
         const uploadedImageFile = event.target.files[0];
@@ -48,42 +52,31 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
         updateImageCollection(newCollection);
     }
 
-    useEffect(() => {
-      OnImagePositionChanged(changesDictionary);
-    }, [changesDictionary])
+    function handleImagePositionInput(axis, event, id){
 
-    function handleImagePositionX(event, id){
-      // THERE IS A FRAME WHERE THIS RETURNS THE VALUE OF THE PREVIOUS MOVED IMAGE
       onImageIDChanged(id);
 
+      var isXAxis = axis === "x";
+      var isYAxis = axis === "y";
+
       const changes = {
-        "positionX": imageXPosition,
-        "positionY": null,
+        "positionX": isXAxis ? imageXPosition : null,
+        "positionY": isYAxis ? imageYPosition : null,
         "imageID": imageID
       }
 
       onChangesDictionaryUpdated(changes);
-      onImageXPositionChanged(event.target.value);
-    }
 
-    function handleImagePositionY(event, id){
-      // THERE IS A FRAME WHERE THIS RETURNS THE VALUE OF THE PREVIOUS MOVED IMAGE
-      onImageIDChanged(id);
+      if(isXAxis) onImageXPositionChanged(event.target.value);
+      else onImageYPositionChanged(event.target.value);
 
-      const changes = {
-        "positionX": null,
-        "positionY": imageYPosition,
-        "imageID": imageID
-      }
-
-      onChangesDictionaryUpdated(changes);
-      onImageYPositionChanged(event.target.value);
+      getImagePosition(imageID);
     }
 
     function getImagePosition(imageID){
       if(imageID === "" || imageID === undefined) return
 
-      console.log("0.1. [IMAGE FORM COMPONENT] IMAGE FORM COMPONENT SENDING ID: " + imageID);
+      // console.log("0.1. [IMAGE FORM COMPONENT] IMAGE FORM COMPONENT SENDING ID: " + imageID);
       OnRetrieveImagePos(imageID);
     }
 
@@ -97,13 +90,10 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
               templateContent[0].map((item, index) => {
 
                 documentRef.current.addEventListener('onImagePosRetrieved', (event) => {
-                  console.log("11. [IMAGE FORM COMPONENT] LISTENING TO EVENT! RECIEVING POSITION: " + event.detail);
-
                   var dataStruct = imageStructure;
-                  dataStruct[item.id] = event.detail;
+                  dataStruct[event.detail.id] = event.detail.pos;
 
                   setImageStructure(dataStruct);
-                  //debugger;
                 })
 
                 //console.log("12. [IMAGE FORM COMPONENT] RECIEVED X: " + itemPosX + " AND Y: " + itemPosY + " FOR ITEM: " + item.id);
@@ -116,22 +106,31 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
                           <label htmlFor={item.id}>Image: </label>
                           <input id={item.id} type='file' accept='*.png' onChange={handleImageUpload}/>
                         </div>
-
-                        <div>
+                        { item.id !== "background" && 
                           <div>
-                            <label htmlFor={item.id + "_x"}>X: </label>
-                            <input id={item.id + "_x"} type='number' onChange={(event) => {handleImagePositionX(event, item.id); getImagePosition(item.id); }} defaultValue={imageStructure[item.id]?.x}/> 
+                            <div>
+                              <label htmlFor={item.id + "_x"}>X: </label>
+                              <input id={item.id + "_x"} 
+                                      type='number' 
+                                      onKeyUpCapture={(event) => handleImagePositionInput("x", event, item.id)} 
+                                      onChange={(event) => handleImagePositionInput("x", event, item.id)} 
+                                      defaultValue={imageStructure[item.id]?.x}/> 
+                            </div>
+                            <div>
+                              <label htmlFor={item.id + "_y"}>Y: </label>
+                              <input id={item.id + "_y"} 
+                                      type='number' 
+                                      onKeyUpCapture={(event) => handleImagePositionInput("y", event, item.id)} 
+                                      onChange={(event) => handleImagePositionInput("y", event, item.id)} 
+                                      defaultValue={imageStructure[item.id]?.y}/> 
+                            </div>
+  
+                            <div>
+                              <label htmlFor={item.id + "_scale"}>Scale: </label>
+                              <input id={item.id + "_scale"} type='number'/> 
+                            </div>
                           </div>
-                          <div>
-                            <label htmlFor={item.id + "_y"}>Y: </label>
-                            <input id={item.id + "_y"} type='number' onChange={(event) => {handleImagePositionY(event, item.id); getImagePosition(item.id); }} defaultValue={imageStructure[item.id]?.y}/> 
-                          </div>
-                        </div>
-
-                        <div>
-                          <label htmlFor={item.id + "_scale"}>Scale: </label>
-                          <input id={item.id + "_scale"} type='number'/> 
-                        </div>
+                        }
                     </div>
                   </div>
                 );
