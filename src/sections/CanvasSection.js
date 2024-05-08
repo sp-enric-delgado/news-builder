@@ -12,9 +12,12 @@ function CanvasSection(){
   const [composition, setComposition] = useState([]);
   const [currentTemplate, setCurrentTemplate] = useState();
 
-  const [changedImage, setChangedImage] = useState({});
   const [imageID, setImageID] = useState("");
   const [imagePosition, setImagePosition] = useState({});
+  const [positionedImage, setPositionedImage] = useState({});
+  const [imageScale, setImageScale] = useState(undefined);
+  const [scaledImage, setScaledImage] = useState({});
+
 
   return (
     <div className='page'>
@@ -25,12 +28,28 @@ function CanvasSection(){
       
       <div className='pageBody'>
         <div className='pageBody-left'>
-          <CanvasComponent AppImageCollection={composition} OnImagePositionChanged={changedImage} OnImageIDRequested={imageID} OnSendImagePosition={setImagePosition}/> 
+          <CanvasComponent AppImageCollection={composition} 
+                           OnImagePositionChanged={positionedImage}
+                           OnImagePosRequested={imageID}
+                           OnSendImagePosition={setImagePosition}
+                           OnImageScaleChanged={scaledImage}
+                           OnImageScaleRequested={imageID}
+                           OnSendImageScale={setImageScale}
+          /> 
         </div>
 
         <div className='pageBody-right'>
           <DropdownComponent ProjectName={projectName}  OnSelectedTemplate={setCurrentTemplate}/>
-          <ImageFormComponent ProjectName={projectName} Template={currentTemplate} OnCollectionUpdated={setComposition} OnImagePositionChanged={setChangedImage} OnRetrieveImagePos={setImageID} OnImagePosRetrieved={imagePosition}/>
+          <ImageFormComponent ProjectName={projectName} 
+                              Template={currentTemplate}
+                              OnCollectionUpdated={setComposition}
+                              OnImagePositionChanged={setPositionedImage}
+                              OnRetrieveImagePos={setImageID}
+                              OnImagePosRetrieved={imagePosition}
+                              OnImageScaleChanged={setScaledImage}
+                              OnRetrieveImageScale={setImageID}
+                              OnImageScaleRetrieved={imageScale}
+          />
         </div>
       </div>
     </div>

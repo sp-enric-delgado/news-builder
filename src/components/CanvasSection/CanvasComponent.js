@@ -2,15 +2,17 @@ import React, { useState, useRef, useEffect } from 'react';
 import { fabric } from 'fabric';
 
 import '../../styles/CanvasComponent.css'
+import { json } from 'react-router-dom';
 
-function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDRequested, OnSendImagePosition}) {
+function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePosRequested, OnSendImagePosition, OnImageScaleChanged, OnImageScaleRequested, OnSendImageScale}) {
     const [backgroundWidth, setBackgroundWidth] = useState(0);
     const [backgroundHeight, setBackgroundHeight] = useState(0);
 
     const [canvas, setCanvas] = useState(null);
     const canvasRef = useRef();
 
-    const [imagePos, setImagePos] = useState();
+    const [imagePos, setImagePos] = useState(undefined);
+    const [imageScale, setImageScale] = useState(undefined);
 
     const canvasDivStyle = {
         width: backgroundWidth,
@@ -28,6 +30,12 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
     useEffect(() => {
         canvas?.on('object:moving', function(event){
             getImagePosition(event.target.id);
+        });
+    }, [canvas]);
+
+    useEffect(() => {
+        canvas?.on('object:scaling', function(event){
+            getImageScale(event.target.id);
         });
     }, [canvas]);
 
@@ -56,14 +64,28 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
     }, [OnImagePositionChanged]);
 
     useEffect(() => {
-        getImagePosition(OnImageIDRequested);
-    }, [OnImageIDRequested])
+        scaleImage(OnImageScaleChanged);
+    }, [OnImageScaleChanged]);
+
+    useEffect(() => {
+        getImagePosition(OnImagePosRequested);
+    }, [OnImagePosRequested])
+
+    useEffect(() => {
+        getImageScale(OnImageScaleRequested);
+    }, [OnImageScaleRequested])
 
     useEffect(() => {
         if(imagePos === undefined)  return; 
         
         OnSendImagePosition(imagePos);
     }, [imagePos])
+
+    useEffect(() => {
+        if(imageScale === undefined)  return; 
+
+        OnSendImageScale(imageScale);
+    }, [imageScale])
 
 
     // PROCESS INCOMING IMAGE(S)
@@ -88,7 +110,7 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
     }
 
     async function addImageToCanvas(imageFile, imageID){
-        const imageURL = URL.createObjectURL(imageFile);
+        const imageURL = await URL.createObjectURL(imageFile);
         canvas.clear();
 
         try{
@@ -107,9 +129,9 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
             canvas.insertAt(img, imageIndex);
             canvas.renderAll.bind(canvas);
 
+            getImagePosition(imageID);
+            getImageScale(imageID);
         } catch (error) { console.log("[CANVAS COMPONENT] COULDN'T ADD IMAGE TO CANVAS: " + error); }
-
-        getImagePosition(imageID);
     }
 
     // MOVE IMAGE
@@ -145,6 +167,11 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
         });
     }
 
+    // SCALE IMAGE
+    function scaleImage(changes){
+        console.log(`[CC] SCALE!! \n${JSON.stringify(changes, null, 4)}`);
+    }
+
     function getImagePosition(imageID){
         if(canvas === null) return;
 
@@ -156,6 +183,29 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImageIDR
             if(imageObject.id === imageID)
             {
                 setImagePos({"id": imageID, "pos": imageObject.getPointByOrigin('center', 'center')});
+            }
+        });
+    }
+
+    function getImageScale(imageID){
+        if(canvas === null) return;
+
+        const canvasImages = canvas.getObjects();
+
+        if(canvasImages.length === 0) return; 
+
+        canvasImages.map(imageObject => {
+            if(imageObject.id === imageID)
+            {
+                const scaleObj = {
+                    "id": imageID, 
+                    "scale": {
+                        "scaleX": imageObject.scaleX, 
+                        "scaleY": imageObject.scaleY
+                    }
+                }
+                
+                setImageScale(scaleObj);
             }
         });
     }
