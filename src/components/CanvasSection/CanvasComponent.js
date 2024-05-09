@@ -2,9 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { fabric } from 'fabric';
 
 import '../../styles/CanvasComponent.css'
-import { json } from 'react-router-dom';
 
-function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePosRequested, OnSendImagePosition, OnImageScaleChanged, OnImageScaleRequested, OnSendImageScale}) {
+function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePosRequested, OnSendImagePosition, OnImageScaleChanged, OnImageScaleRequested, OnSendImageScale, OnImageRepositionRequest}) {
     const [backgroundWidth, setBackgroundWidth] = useState(0);
     const [backgroundHeight, setBackgroundHeight] = useState(0);
 
@@ -18,6 +17,10 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
         width: backgroundWidth,
         height: backgroundHeight
     };
+
+    useEffect(() => {
+        adjustImagePositioning(OnImageRepositionRequest)
+    }, [OnImageRepositionRequest])
 
     useEffect(() => {
         var cnv = new fabric.Canvas(canvasRef.current);
@@ -134,6 +137,30 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
         } catch (error) { console.log("[CANVAS COMPONENT] COULDN'T ADD IMAGE TO CANVAS: " + error); }
     }
 
+    function adjustImagePositioning(eventData){
+        if(canvas === null) return;
+        const canvasImages = canvas.getObjects();
+        if(canvasImages.length === 0) return; 
+
+        console.log(`[CC] Repositioning image with data: ${JSON.stringify(eventData, null, 4)}`);
+        const imageID = eventData.id; 
+        const positioning = eventData.positioning;
+
+        canvasImages.map(imageObject => {
+            if(imageObject.id === imageID)
+            {
+                if(positioning === "Backwards"){
+                    canvas.sendBackwards(imageObject);
+                }
+                else{
+                    canvas.bringForward(imageObject);
+                }
+            }
+        });
+
+        canvas.renderAll();
+    }
+
     // MOVE IMAGE
     function translateImage(changes){
         if(canvas == null) return;
@@ -195,8 +222,6 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
                 currentImage.scaleY = scaleY;
 
                 setImageScale({"scaleX": currentImage.scaleX, "scaleY": currentImage.scaleY});
-                
-                canvas.renderAll();
             } 
         });
     }

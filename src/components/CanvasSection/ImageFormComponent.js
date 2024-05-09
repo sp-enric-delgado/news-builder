@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../styles/ImageFormComponent.css'
+import { json } from 'react-router-dom';
 
-function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImagePositionChanged, OnRetrieveImagePos, OnImagePosRetrieved, OnImageScaleChanged, OnRetrieveImageScale, OnImageScaleRetrieved}) {
+function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImagePositionChanged, OnRetrieveImagePos, OnImagePosRetrieved, OnImageScaleChanged, OnRetrieveImageScale, OnImageScaleRetrieved, OnImageRepositionRequest}) {
 
     const [imageCollection, updateImageCollection] = useState({});
     const [templateContent, setTemplateContent] = useState([]);
@@ -18,10 +19,8 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
 
     const [imagePositionDict, setImagePositionDict] = useState({});
     const [imageScaleDict, setImageScaleDict] = useState({});
+    const [imageRepositionData, setImageRepositionData] = useState({});
 
-    // IN ORDER TO DYNAMICALLY GET THE POSITION OF THE IMAGE, THIS SHOULD BE AN EVENT
-    const onImagePosRetrieved = new Event('onImagePosRetrieved');
-    const onImageScaleRetrieved = new Event('onImageScaleRetrieved');
     const documentRef = useRef(document);
 
     useEffect(() => {
@@ -39,6 +38,8 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
 
     useEffect(() => {
       // console.log("10. [IMAGE FORM COMPONENT] IMAGE POSITION RETRIEVED! CALLING EVENT...");
+      if(OnImagePosRetrieved === undefined) return;
+
       const customPosEvent = new CustomEvent('onImagePosRetrieved', {detail: OnImagePosRetrieved});
       documentRef.current.dispatchEvent(customPosEvent);
     }, [OnImagePosRetrieved])
@@ -50,6 +51,15 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
       const customScaleEvent = new CustomEvent('onImageScaleRetrieved', {detail: OnImageScaleRetrieved});
       documentRef.current.dispatchEvent(customScaleEvent);
     }, [OnImageScaleRetrieved])
+
+    useEffect(() => {
+      if(imageRepositionData === undefined) return
+
+      // const customRepositionEvent = new CustomEvent('onImageReposition', {detail: imageRepositionData});
+      // documentRef.current.dispatchEvent(customRepositionEvent);
+
+      OnImageRepositionRequest(imageRepositionData);
+    }, [imageRepositionData])
 
     useEffect(() => {
       OnImagePositionChanged(posDictionary);
@@ -127,6 +137,17 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
       OnRetrieveImageScale(imageID);
     }
 
+    function onImageReposition(itemID, positioning){
+      if(imageID === null || imageID === "") return;
+
+      const repositionData = {
+        "id": itemID,
+        "positioning": positioning
+      }
+
+      setImageRepositionData(repositionData);
+    } 
+
     function generateInputFields() {
       if (Array.isArray(templateContent) && templateContent.length > 0)
       {
@@ -163,22 +184,24 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
                         { item.id !== "background" && 
                           <div>
                             <div>
-                              <label htmlFor={item.id + "_x"}>X: </label>
-                              <input id={item.id + "_x"} 
-                                      type='number' 
-                                      onKeyUpCapture={(event) => handleImagePositionInput("x", event, item.id)} 
-                                      onChange={(event) => handleImagePositionInput("x", event, item.id)} 
-                                      defaultValue={imagePositionDict[item.id]?.x}/> 
+                              <div>
+                                <label htmlFor={item.id + "_x"}>X: </label>
+                                <input id={item.id + "_x"} 
+                                        type='number' 
+                                        onKeyUpCapture={(event) => handleImagePositionInput("x", event, item.id)} 
+                                        onChange={(event) => handleImagePositionInput("x", event, item.id)} 
+                                        defaultValue={imagePositionDict[item.id]?.x}/> 
+                              </div>
+                              <div>
+                                <label htmlFor={item.id + "_y"}>Y: </label>
+                                <input id={item.id + "_y"} 
+                                        type='number' 
+                                        onKeyUpCapture={(event) => handleImagePositionInput("y", event, item.id)} 
+                                        onChange={(event) => handleImagePositionInput("y", event, item.id)} 
+                                        defaultValue={imagePositionDict[item.id]?.y}/> 
+                              </div>
                             </div>
-                            <div>
-                              <label htmlFor={item.id + "_y"}>Y: </label>
-                              <input id={item.id + "_y"} 
-                                      type='number' 
-                                      onKeyUpCapture={(event) => handleImagePositionInput("y", event, item.id)} 
-                                      onChange={(event) => handleImagePositionInput("y", event, item.id)} 
-                                      defaultValue={imagePositionDict[item.id]?.y}/> 
-                            </div>
-  
+                            
                             <div>
                               <div>
                                 <label htmlFor={item.id + "_scaleX"}>X Scale: </label>
@@ -200,6 +223,12 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
                                        defaultValue={imageScaleDict[item.id]?.scaleY}
                                 /> 
                               </div>
+                            </div>
+
+                            <div>
+                              <h5>Layer Order</h5>
+                              <button onClick={(event) => onImageReposition(item.id, "Forward")}>Bring Forward</button>
+                              <button onClick={(event) => onImageReposition(item.id, "Backwards")}>Bring Backwards</button>
                             </div>
                           </div>
                         }
