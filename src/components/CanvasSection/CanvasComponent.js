@@ -124,7 +124,7 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
                 setBackgroundHeight(img.height);
             }
 
-            img.setOptions({ left: 0, top: 0, scaleX: 1, scaleY: 1, selectable: !isBackground, id: imageID});
+            img.setOptions({ left: 0, bottom: 0, scaleX: 1, scaleY: 1, selectable: !isBackground, id: imageID});
 
             canvas.insertAt(img, imageIndex);
             canvas.renderAll.bind(canvas);
@@ -151,7 +151,7 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
             {
                 currentImage = imageObject;
 
-                const currentPosition = currentImage.getPointByOrigin('top', 'left');
+                const currentPosition = currentImage.getPointByOrigin('bottom', 'left');
 
                 xPos = xPos === null ? currentPosition.x : parseInt(xPos);
                 yPos = yPos === null ? currentPosition.y : parseInt(yPos);
@@ -162,6 +162,8 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
                     'left'
                 );
 
+                setImagePos(currentImage.getPointByOrigin('bottom', 'left'));
+
                 canvas.renderAll();
             } 
         });
@@ -169,7 +171,34 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
 
     // SCALE IMAGE
     function scaleImage(changes){
-        console.log(`[CC] SCALE!! \n${JSON.stringify(changes, null, 4)}`);
+        if(canvas == null) return;
+
+        var scaleX = changes.scaleX;
+        var scaleY = changes.scaleY;
+        const imageID = changes.imageID;
+
+        var currentImage;
+        const canvasImages = canvas.getObjects();
+
+        canvasImages.map(imageObject => {
+
+            if(imageObject.id === imageID)
+            {
+                currentImage = imageObject;
+
+                const currentScale = {"scaleX": currentImage.scaleX, "scaleY": currentImage.scaleY};
+
+                scaleX = scaleX === null ? currentScale.scaleX : parseFloat(scaleX);
+                scaleY = scaleY === null ? currentScale.scaleY : parseFloat(scaleY);
+                
+                currentImage.scaleX = scaleX;
+                currentImage.scaleY = scaleY;
+
+                setImageScale({"scaleX": currentImage.scaleX, "scaleY": currentImage.scaleY});
+                
+                canvas.renderAll();
+            } 
+        });
     }
 
     function getImagePosition(imageID){
@@ -182,7 +211,7 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
         canvasImages.map(imageObject => {
             if(imageObject.id === imageID)
             {
-                setImagePos({"id": imageID, "pos": imageObject.getPointByOrigin('center', 'center')});
+                setImagePos({"id": imageID, "pos": imageObject.getPointByOrigin('bottom', 'left')});
             }
         });
     }

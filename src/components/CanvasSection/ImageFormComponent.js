@@ -184,6 +184,7 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
                                 <label htmlFor={item.id + "_scaleX"}>X Scale: </label>
                                 <input id={item.id + "_scaleX"} 
                                        type='number'
+                                       step="0.1"
                                        onKeyUpCapture={(event) => handleImageScaleInput("x", event, item.id)} 
                                        onChange={(event) => handleImageScaleInput("x", event, item.id)} 
                                        defaultValue={imageScaleDict[item.id]?.scaleX}
@@ -193,6 +194,7 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
                                 <label htmlFor={item.id + "_scaleY"}>Y Scale: </label>
                                 <input id={item.id + "_scaleY"} 
                                        type='number'
+                                       step="0.1"
                                        onKeyUpCapture={(event) => handleImageScaleInput("y", event, item.id)} 
                                        onChange={(event) => handleImageScaleInput("y", event, item.id)} 
                                        defaultValue={imageScaleDict[item.id]?.scaleY}
