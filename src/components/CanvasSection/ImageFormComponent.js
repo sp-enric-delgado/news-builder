@@ -201,7 +201,6 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
                                         defaultValue={imagePositionDict[item.id]?.y}/> 
                               </div>
                             </div>
-                            
                             <div>
                               <div>
                                 <label htmlFor={item.id + "_scaleX"}>X Scale: </label>
@@ -232,6 +231,9 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
                             </div>
                           </div>
                         }
+                        <div>
+                          <hr />
+                        </div>
                     </div>
                   </div>
                 );

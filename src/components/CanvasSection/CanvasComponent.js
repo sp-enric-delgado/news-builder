@@ -3,7 +3,15 @@ import { fabric } from 'fabric';
 
 import '../../styles/CanvasComponent.css'
 
-function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePosRequested, OnSendImagePosition, OnImageScaleChanged, OnImageScaleRequested, OnSendImageScale, OnImageRepositionRequest}) {
+function CanvasComponent({AppImageCollection, 
+                          OnImagePositionChanged, 
+                          OnImagePosRequested, 
+                          OnSendImagePosition, 
+                          OnImageScaleChanged, 
+                          OnImageScaleRequested, 
+                          OnSendImageScale, 
+                          OnImageRepositionRequest}) 
+{
     const [backgroundWidth, setBackgroundWidth] = useState(0);
     const [backgroundHeight, setBackgroundHeight] = useState(0);
 
@@ -180,8 +188,8 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
 
                 const currentPosition = currentImage.getPointByOrigin('bottom', 'left');
 
-                xPos = xPos === null ? currentPosition.x : parseInt(xPos);
-                yPos = yPos === null ? currentPosition.y : parseInt(yPos);
+                xPos = xPos === null ? currentPosition.x.toFixed(2) : parseInt(xPos).toFixed(2);
+                yPos = yPos === null ? currentPosition.y.toFixed(2) : parseInt(yPos).toFixed(2);
                 
                 currentImage.setPositionByOrigin(
                     new fabric.Point(xPos, yPos),
@@ -215,8 +223,8 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
 
                 const currentScale = {"scaleX": currentImage.scaleX, "scaleY": currentImage.scaleY};
 
-                scaleX = scaleX === null ? currentScale.scaleX : parseFloat(scaleX);
-                scaleY = scaleY === null ? currentScale.scaleY : parseFloat(scaleY);
+                scaleX = scaleX === null ? currentScale.scaleX.toFixed(2) : parseFloat(scaleX).toFixed(2);
+                scaleY = scaleY === null ? currentScale.scaleY.toFixed(2) : parseFloat(scaleY).toFixed(2);
                 
                 currentImage.scaleX = scaleX;
                 currentImage.scaleY = scaleY;
@@ -239,6 +247,8 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
                 setImagePos({"id": imageID, "pos": imageObject.getPointByOrigin('bottom', 'left')});
             }
         });
+
+        canvas.renderAll();
     }
 
     function getImageScale(imageID){
@@ -262,10 +272,13 @@ function CanvasComponent({AppImageCollection, OnImagePositionChanged, OnImagePos
                 setImageScale(scaleObj);
             }
         });
+
+        canvas.renderAll();
     }
 
     function handleProcessImages(){
         if (canvas) {
+            canvas.renderAll();
             const dataURL = canvas.toDataURL('image/png');
             const a = document.createElement('a');
             a.href = dataURL;
