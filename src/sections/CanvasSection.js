@@ -18,6 +18,7 @@ function CanvasSection(){
   const [imageScale, setImageScale] = useState(undefined);
   const [scaledImage, setScaledImage] = useState({});
   const [repositionRequest, setRepositionRequest] = useState({});
+  const [selectionRequest, setSelectionRequest] = useState("");
 
 
   return (
@@ -37,6 +38,7 @@ function CanvasSection(){
                            OnImageScaleRequested={imageID}
                            OnSendImageScale={setImageScale}
                            OnImageRepositionRequest={repositionRequest}
+                           OnImageSelectionRequest={selectionRequest}
           /> 
         </div>
 
@@ -52,6 +54,7 @@ function CanvasSection(){
                               OnRetrieveImageScale={setImageID}
                               OnImageScaleRetrieved={imageScale}
                               OnImageRepositionRequest={setRepositionRequest}
+                              OnImageSelectionRequest={setSelectionRequest}
           />
         </div>
       </div>

@@ -10,3 +10,7 @@
 
     border: 3px solid red;
 }
+
+.element:has(> .components:has(> .selection-component:has(> .selected))){
+    background-color: red;
+}

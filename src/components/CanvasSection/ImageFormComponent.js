@@ -2,7 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import '../../styles/ImageFormComponent.css'
 import { json } from 'react-router-dom';
 
-function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImagePositionChanged, OnRetrieveImagePos, OnImagePosRetrieved, OnImageScaleChanged, OnRetrieveImageScale, OnImageScaleRetrieved, OnImageRepositionRequest}) {
+function ImageFormComponent({ProjectName, 
+                             Template, 
+                             OnCollectionUpdated, 
+                             OnImagePositionChanged, 
+                             OnRetrieveImagePos, 
+                             OnImagePosRetrieved, 
+                             OnImageScaleChanged, 
+                             OnRetrieveImageScale, 
+                             OnImageScaleRetrieved, 
+                             OnImageRepositionRequest, 
+                             OnImageSelectionRequest}) 
+{
 
     const [imageCollection, updateImageCollection] = useState({});
     const [templateContent, setTemplateContent] = useState([]);
@@ -20,6 +31,9 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
     const [imagePositionDict, setImagePositionDict] = useState({});
     const [imageScaleDict, setImageScaleDict] = useState({});
     const [imageRepositionData, setImageRepositionData] = useState({});
+    const [imageSelectionData, setImageSelectionData] = useState("");
+
+    const [componentStyle, setComponentStyle] = useState("");
 
     const documentRef = useRef(document);
 
@@ -55,9 +69,6 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
     useEffect(() => {
       if(imageRepositionData === undefined) return
 
-      // const customRepositionEvent = new CustomEvent('onImageReposition', {detail: imageRepositionData});
-      // documentRef.current.dispatchEvent(customRepositionEvent);
-
       OnImageRepositionRequest(imageRepositionData);
     }, [imageRepositionData])
 
@@ -68,6 +79,10 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
     useEffect(() => {
       OnImageScaleChanged(scaleDictionary);
     }, [scaleDictionary])
+
+    useEffect(() => { 
+      OnImageSelectionRequest(imageSelectionData);
+    }, [imageSelectionData])
 
     function handleImageUpload(event){
         const uploadedImageFile = event.target.files[0];
@@ -138,7 +153,7 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
     }
 
     function onImageReposition(itemID, positioning){
-      if(imageID === null || imageID === "") return;
+      if(itemID === null || itemID === "") return;
 
       const repositionData = {
         "id": itemID,
@@ -147,6 +162,15 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
 
       setImageRepositionData(repositionData);
     } 
+
+    function onImageSelect(itemID){
+      if(itemID === null || itemID === "") return;
+
+      setComponentStyle("selected");
+      setImageSelectionData(itemID);
+
+      debugger;
+    }
 
     function generateInputFields() {
       if (Array.isArray(templateContent) && templateContent.length > 0)
@@ -175,14 +199,14 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
 
                 return(
                   <div key={index}>
-                    <div>
+                    <div className='element'>
                       <h3>{item.name}</h3>
                         <div>
                           <label htmlFor={item.id}>Image: </label>
                           <input id={item.id} type='file' accept='*.png' onChange={handleImageUpload}/>
                         </div>
                         { item.id !== "background" && 
-                          <div>
+                          <div className='components'>
                             <div>
                               <div>
                                 <label htmlFor={item.id + "_x"}>X: </label>
@@ -225,9 +249,20 @@ function ImageFormComponent({ProjectName, Template, OnCollectionUpdated, OnImage
                             </div>
 
                             <div>
-                              <h5>Layer Order</h5>
-                              <button onClick={(event) => onImageReposition(item.id, "Forward")}>Bring Forward</button>
-                              <button onClick={(event) => onImageReposition(item.id, "Backwards")}>Bring Backwards</button>
+                              <label htmlFor="layer-buttons">Layer Order</label>
+                              <div id="layer-buttons">
+                                <button onClick={(event) => onImageReposition(item.id, "Forward")}>Bring Forward</button>
+                                <button onClick={(event) => onImageReposition(item.id, "Backwards")}>Bring Backwards</button>
+                              </div>
+                            </div>
+
+                            <div className='selection-component'>
+                              <label htmlFor="selection-button">Select Object</label>
+                              <button className="selected" id="selection-button" onClick={(event) => onImageSelect(item.id)}>Select</button>
+                            </div>
+
+                            <div>
+
                             </div>
                           </div>
                         }

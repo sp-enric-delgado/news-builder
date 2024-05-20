@@ -10,7 +10,8 @@ function CanvasComponent({AppImageCollection,
                           OnImageScaleChanged, 
                           OnImageScaleRequested, 
                           OnSendImageScale, 
-                          OnImageRepositionRequest}) 
+                          OnImageRepositionRequest,
+                          OnImageSelectionRequest}) 
 {
     const [backgroundWidth, setBackgroundWidth] = useState(0);
     const [backgroundHeight, setBackgroundHeight] = useState(0);
@@ -97,6 +98,10 @@ function CanvasComponent({AppImageCollection,
 
         OnSendImageScale(imageScale);
     }, [imageScale])
+
+    useEffect(() => {
+        onSelectImage(OnImageSelectionRequest);
+    }, [OnImageSelectionRequest])
 
 
     // PROCESS INCOMING IMAGE(S)
@@ -188,8 +193,8 @@ function CanvasComponent({AppImageCollection,
 
                 const currentPosition = currentImage.getPointByOrigin('bottom', 'left');
 
-                xPos = xPos === null ? currentPosition.x.toFixed(2) : parseInt(xPos).toFixed(2);
-                yPos = yPos === null ? currentPosition.y.toFixed(2) : parseInt(yPos).toFixed(2);
+                xPos = xPos === null ? currentPosition.x : parseInt(xPos);
+                yPos = yPos === null ? currentPosition.y : parseInt(yPos);
                 
                 currentImage.setPositionByOrigin(
                     new fabric.Point(xPos, yPos),
@@ -223,13 +228,15 @@ function CanvasComponent({AppImageCollection,
 
                 const currentScale = {"scaleX": currentImage.scaleX, "scaleY": currentImage.scaleY};
 
-                scaleX = scaleX === null ? currentScale.scaleX.toFixed(2) : parseFloat(scaleX).toFixed(2);
-                scaleY = scaleY === null ? currentScale.scaleY.toFixed(2) : parseFloat(scaleY).toFixed(2);
+                scaleX = scaleX === null ? currentScale.scaleX : parseFloat(scaleX);
+                scaleY = scaleY === null ? currentScale.scaleY : parseFloat(scaleY);
                 
                 currentImage.scaleX = scaleX;
                 currentImage.scaleY = scaleY;
 
                 setImageScale({"scaleX": currentImage.scaleX, "scaleY": currentImage.scaleY});
+
+                currentImage.dirty = true;
             } 
         });
     }
@@ -285,6 +292,24 @@ function CanvasComponent({AppImageCollection,
             a.download = 'test';
             a.click();
         }
+    }
+
+    function onSelectImage(itemID){
+        if(canvas === null) return;
+        if(itemID === null || itemID === "") return;
+
+        const canvasImages = canvas.getObjects();
+
+        if(canvasImages.length === 0) return;
+
+        canvasImages.map(imageObject => {
+            if(imageObject.id === itemID){
+                canvas.setActiveObject(imageObject);
+            }
+            else {imageObject.dirty = true;}
+        })
+
+        canvas.renderAll();
     }
 
     return(
