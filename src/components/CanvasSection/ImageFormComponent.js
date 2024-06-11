@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../styles/ImageFormComponent.css'
 import { json } from 'react-router-dom';
+import {EVENT_ON_CANVAS_GET_IMAGE_POSITION} from "./CanvasElements/CanvasEvents";
 
 function ImageFormComponent({ProjectName, 
                              Template, 
@@ -181,7 +182,7 @@ function ImageFormComponent({ProjectName,
             {
               templateContent[0].map((item, index) => {
 
-                documentRef.current.addEventListener('onImagePosRetrieved', (event) => {
+                documentRef.current.addEventListener(EVENT_ON_CANVAS_GET_IMAGE_POSITION, (event) => {
                   var positionData = imagePositionDict;
                   positionData[event.detail.id] = event.detail.pos;
 

@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { fabric } from 'fabric';
+import * as CanvasActions from './CanvasElements/CanvasActions'
 
 import '../../styles/CanvasComponent.css'
+import {dispatchCanvasGetImagePosition} from "./CanvasElements/CanvasEvents";
 
 function CanvasComponent({AppImageCollection, 
                           OnImagePositionChanged, 
@@ -39,9 +41,13 @@ function CanvasComponent({AppImageCollection,
         setBackgroundWidth(1);
     }, []);
 
+    /*
+        Each time an object in the canvas moves, notify everybody that needs to know its position
+    */
     useEffect(() => {
         canvas?.on('object:moving', function(event){
             getImagePosition(event.target.id);
+            CanvasActions.getImagePosition(canvas, event.target.id);
         });
     }, [canvas]);
 
@@ -155,7 +161,7 @@ function CanvasComponent({AppImageCollection,
         const canvasImages = canvas.getObjects();
         if(canvasImages.length === 0) return; 
 
-        console.log(`[CC] Repositioning image with data: ${JSON.stringify(eventData, null, 4)}`);
+        // console.log(`[CC] Repositioning image with data: ${JSON.stringify(eventData, null, 4)}`);
         const imageID = eventData.id; 
         const positioning = eventData.positioning;
 
