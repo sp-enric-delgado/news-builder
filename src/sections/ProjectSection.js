@@ -27,7 +27,6 @@ function ProjectSection(){
 
     /* IF A NEW PROJECT IS CREATED, FETCH AGAIN AND UPDATE */
     async function handleNewProject(){
-        console.log("HANDLING NEW PROJECTS");
         try {
             const response = await fetch('http://localhost:3001/projects', {
               method: 'GET',

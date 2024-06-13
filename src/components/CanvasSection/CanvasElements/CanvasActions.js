@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import {dispatchCanvasGetImagePosition, OnCanvasImageScaled} from "./CanvasEvents";
+import {dispatchCanvasGetImagePosition, dispatchCanvasGetImageScale} from "./CanvasEvents";
 
 export async function addImageToCanvas(canvas, imageFile, imageID){
     const imageURL = URL.createObjectURL(imageFile);
@@ -45,34 +45,34 @@ export function getImagePosition(canvas, imageID){
 }
 
 export function dispatchUpdateImagePosition(canvas, imageID){
-    // console.log("[CanvasActions] dispatchUpdateImagePosition of image " + imageID);
     dispatchCanvasGetImagePosition(getImagePosition(canvas, imageID));
 }
 
 function getImageScale(canvas, imageID){
     if(canvas === null) return;
-
     const canvasImages = canvas.getObjects();
-
     if(canvasImages.length === 0) return;
+
+    let data = {}
 
     canvasImages.map(imageObject => {
         if(imageObject.id === imageID)
         {
-            const scaleObj = {
+            data = {
                 "id": imageID,
                 "scale": {
-                    "scaleX": imageObject.scaleX,
-                    "scaleY": imageObject.scaleY
+                    "x": imageObject.scaleX,
+                    "y": imageObject.scaleY
                 }
             }
-
-            // setImageScale(scaleObj);
-            OnCanvasImageScaled(scaleObj);
         }
     });
 
-    canvas.renderAll();
+    return data;
+}
+
+export function dispatchUpdateImageScale(canvas, imageID){
+    dispatchCanvasGetImageScale(getImageScale(canvas, imageID));
 }
 
 //#region INTERNAL FUNCTIONS

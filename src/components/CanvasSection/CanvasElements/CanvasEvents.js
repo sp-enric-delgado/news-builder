@@ -1,11 +1,10 @@
 export const EVENT_ON_CANVAS_GET_IMAGE_POSITION = "onCanvasGetImagePosition";
-export const EVENT_ON_CANVAS_IMAGE_SCALED = "onCanvasImageScaled";
+export const EVENT_ON_CANVAS_GET_IMAGE_SCALE = "onCanvasGetImageScale";
 
 export function dispatchCanvasGetImagePosition(data) {
-    // console.log("[CanvasEvents] dispatchCanvasGetImagePosition with data ", data);
     document.dispatchEvent(new CustomEvent(EVENT_ON_CANVAS_GET_IMAGE_POSITION, {detail: data}));
 }
 
-export function OnCanvasImageScaled(data) {
-    document.dispatchEvent(new Event("onCanvasImageScaled", data));
+export function dispatchCanvasGetImageScale(data) {
+    document.dispatchEvent(new CustomEvent(EVENT_ON_CANVAS_GET_IMAGE_SCALE, {detail: data}));
 }

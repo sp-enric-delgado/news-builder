@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../../styles/ImageFormComponent.css'
 import { json } from 'react-router-dom';
-import {EVENT_ON_CANVAS_GET_IMAGE_POSITION} from "./CanvasElements/CanvasEvents";
+import {EVENT_ON_CANVAS_GET_IMAGE_POSITION, EVENT_ON_CANVAS_GET_IMAGE_SCALE} from "./CanvasElements/CanvasEvents";
 import * as FormEvent from './FormEvents/FormEvents'
 
 function ImageFormComponent({ProjectName, 
@@ -20,26 +20,26 @@ function ImageFormComponent({ProjectName,
     const [imageCollection, updateImageCollection] = useState({});
     const [templateContent, setTemplateContent] = useState([]);
 
-    const [imageXScale, onImageXScaleChanged] = useState();
-    const [imageYScale, onImageYScaleChanged] = useState();
-    const [scaleDictionary, onScaleDictionaryUpdated] = useState({});
-
-    const [imageID, onImageIDChanged] = useState();
-
     const [imagePositionDict, setImagePositionDict] = useState({});
     const [imageScaleDict, setImageScaleDict] = useState({});
     const [imageRepositionData, setImageRepositionData] = useState({});
     const [imageSelectionData, setImageSelectionData] = useState("");
 
-    const documentRef = useRef(document);
-
     useState(() => {
-        documentRef.current.addEventListener(EVENT_ON_CANVAS_GET_IMAGE_POSITION, (e) => updateImagePositionValue(e.detail));
+        document.addEventListener(EVENT_ON_CANVAS_GET_IMAGE_POSITION, (e) => updateImagePositionValue(e.detail));
 
         return () => {
-            documentRef.current.removeEventListener(EVENT_ON_CANVAS_GET_IMAGE_POSITION, (e) => updateImagePositionValue(e.detail));
+            document.removeEventListener(EVENT_ON_CANVAS_GET_IMAGE_POSITION, (e) => updateImagePositionValue(e.detail));
         }
     }, [imagePositionDict])
+
+    useState(() => {
+        document.addEventListener(EVENT_ON_CANVAS_GET_IMAGE_SCALE, (e) => updateImageScaleValue(e.detail));
+
+        return () => {
+            document.removeEventListener(EVENT_ON_CANVAS_GET_IMAGE_SCALE, (e) => updateImageScaleValue(e.detail));
+        }
+    }, [imageScaleDict])
 
     useEffect(() => {
       fetch(`http://localhost:3001/templates?projectName=${encodeURIComponent(ProjectName)}`)
@@ -55,30 +55,10 @@ function ImageFormComponent({ProjectName,
     }, [Template])
 
     useEffect(() => {
-      // console.log("10. [IMAGE FORM COMPONENT] IMAGE POSITION RETRIEVED! CALLING EVENT...");
-      if(OnImagePosRetrieved === undefined) return;
-
-      const customPosEvent = new CustomEvent('onImagePosRetrieved', {detail: OnImagePosRetrieved});
-      documentRef.current.dispatchEvent(customPosEvent);
-    }, [OnImagePosRetrieved])
-
-    useEffect(() => {
-      // console.log("10. [IMAGE FORM COMPONENT] IMAGE POSITION RETRIEVED! CALLING EVENT...");
-      if(OnImageScaleRetrieved === undefined) return;
-
-      const customScaleEvent = new CustomEvent('onImageScaleRetrieved', {detail: OnImageScaleRetrieved});
-      documentRef.current.dispatchEvent(customScaleEvent);
-    }, [OnImageScaleRetrieved])
-
-    useEffect(() => {
       if(imageRepositionData === undefined) return
 
       OnImageRepositionRequest(imageRepositionData);
     }, [imageRepositionData])
-
-    useEffect(() => {
-      OnImageScaleChanged(scaleDictionary);
-    }, [scaleDictionary])
 
     useEffect(() => { 
       OnImageSelectionRequest(imageSelectionData);
@@ -97,54 +77,36 @@ function ImageFormComponent({ProjectName,
         updateImageCollection(newCollection);
     }
 
-    function handleImagePositionInput(axis, event, id){
+    function handleImagePositionInput(axis, value, id){
         //1. Get input data
         const isXAxis = axis === "x";
         const isYAxis = axis === "y";
 
         const changes = {
+            "id": id,
             "pos": {
-                "x": isXAxis ? event.target.value : imagePositionDict[id]?.x,
-                "y": isYAxis ? event.target.value : imagePositionDict[id]?.y,
-            },
-            "id": id
-        }
+                "x": isXAxis ? value : imagePositionDict[id]?.x,
+                "y": isYAxis ? value : imagePositionDict[id]?.y,
+            }
+        };
 
         //2. Send position to canvas image with ID and place it
         FormEvent.dispatchEventOnFormImagePosChanged(changes);
-
-        //3. Retrieve position canvas
-        //FormEvent.dispatchEventOnFormRequestCanvasImagePos(changes.id);
-
-        //3.2 Update the position Dictionary accordingly
     }
 
-    function handleImageScaleInput(axis, event, id){
+    function handleImageScaleInput(axis, value, id){
+        const isXAxis = axis === "x";
+        const isYAxis = axis === "y";
 
-      onImageIDChanged(id);
+        const changes = {
+            "id": id,
+            "scale": {
+                x: isXAxis ? value : imageScaleDict[id]?.x,
+                y: isYAxis ? value : imageScaleDict[id]?.y
+            }
+        };
 
-      var isXAxis = axis === "x";
-      var isYAxis = axis === "y";
-
-      const changes = {
-        "scaleX": isXAxis ? imageXScale : null,
-        "scaleY": isYAxis ? imageYScale : null,
-        "imageID": imageID
-      }
-
-      onScaleDictionaryUpdated(changes);
-
-      if(isXAxis) onImageXScaleChanged(event.target.value);
-      else onImageYScaleChanged(event.target.value);
-
-      getImageScale(imageID);
-    }
-
-    function getImageScale(imageID){
-      if(imageID === "" || imageID === undefined) return
-
-      // console.log("0.1. [IMAGE FORM COMPONENT] IMAGE FORM COMPONENT SENDING ID: " + imageID);
-      OnRetrieveImageScale(imageID);
+        FormEvent.dispatchEventOnFormImageScaleChanged(changes);
     }
 
     function onImageReposition(itemID, positioning){
@@ -165,14 +127,17 @@ function ImageFormComponent({ProjectName,
     }
 
     function updateImagePositionValue(data){
-        // console.log("[ImageFormComponent] Listening to " + EVENT_ON_CANVAS_GET_IMAGE_POSITION + " and receiving", event.detail);
-
         const newImagePositionDict = {...imagePositionDict};
         newImagePositionDict[data.id] = data.pos;
 
         setImagePositionDict(newImagePositionDict);
+    }
 
-        console.log("[IFC] Pos received through event: ", data.pos, "Pos set in state: ", imagePositionDict[data.id]);
+    function updateImageScaleValue(data){
+        const newImageScaleDict = {...imageScaleDict};
+        newImageScaleDict[data.id] = data.scale;
+
+        setImageScaleDict(newImageScaleDict);
     }
 
     function generateInputFields() {
@@ -183,15 +148,6 @@ function ImageFormComponent({ProjectName,
             <h1>{Template}</h1>
             {
               templateContent[0].map((item, index) => {
-
-
-
-                documentRef.current.addEventListener('onImageScaleRetrieved', (event) => {
-                  var scaleData = imageScaleDict;
-
-                  scaleData[event.detail.id] = event.detail.scale;
-                  setImageScaleDict(scaleData);
-                });
 
                 return(
                   <div key={index}>
@@ -208,37 +164,34 @@ function ImageFormComponent({ProjectName,
                                 <label htmlFor={item.id + "_x"}>X: </label>
                                 <input id={item.id + "_x"} 
                                         type='number'
-                                        onChange={(event) => handleImagePositionInput("x", event, item.id)}
+                                        onChange={(event) => handleImagePositionInput("x", event.target.value, item.id)}
                                         value={imagePositionDict[item.id]?.x}/>
                               </div>
                               <div>
                                 <label htmlFor={item.id + "_y"}>Y: </label>
                                 <input id={item.id + "_y"} 
                                         type='number'
-                                        onChange={(event) => handleImagePositionInput("y", event, item.id)} 
+                                        onChange={(event) => handleImagePositionInput("y", event.target.value, item.id)}
                                         value={imagePositionDict[item.id]?.y}/>
                               </div>
                             </div>
+
                             <div>
                               <div>
                                 <label htmlFor={item.id + "_scaleX"}>X Scale: </label>
                                 <input id={item.id + "_scaleX"} 
                                        type='number'
-                                       step="1"
-                                       onKeyUpCapture={(event) => handleImageScaleInput("x", event, item.id)} 
-                                       onChange={(event) => handleImageScaleInput("x", event, item.id)} 
-                                       value={imageScaleDict[item.id]?.scaleX}
-                                /> 
+                                       step="0.1"
+                                       onChange={(event) => handleImageScaleInput("x", event.target.value, item.id)}
+                                       value={imageScaleDict[item.id]?.x}/>
                               </div>
                               <div>
                                 <label htmlFor={item.id + "_scaleY"}>Y Scale: </label>
                                 <input id={item.id + "_scaleY"} 
                                        type='number'
-                                       step="1"
-                                       onKeyUpCapture={(event) => handleImageScaleInput("y", event, item.id)} 
-                                       onChange={(event) => handleImageScaleInput("y", event, item.id)} 
-                                       value={imageScaleDict[item.id]?.scaleY}
-                                /> 
+                                       step="0.1"
+                                       onChange={(event) => handleImageScaleInput("y", event.target.value, item.id)}
+                                       value={imageScaleDict[item.id]?.y}/>
                               </div>
                             </div>
 

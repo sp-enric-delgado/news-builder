@@ -3,9 +3,7 @@ import { fabric } from 'fabric';
 import * as CanvasActions from './CanvasElements/CanvasActions'
 
 import '../../styles/CanvasComponent.css'
-import {dispatchCanvasGetImagePosition} from "./CanvasElements/CanvasEvents";
-import {EVENT_ON_FORM_IMAGE_POS_CHANGED, EVENT_ON_FORM_REQUEST_CANVAS_IMAGE_POS} from "./FormEvents/FormEvents";
-import {dispatchUpdateImagePosition, getImagePosition} from "./CanvasElements/CanvasActions";
+import {EVENT_ON_FORM_IMAGE_POS_CHANGED, EVENT_ON_FORM_IMAGE_SCALE_CHANGED} from "./FormEvents/FormEvents";
 
 function CanvasComponent({AppImageCollection, 
                           OnImagePositionChanged, 
@@ -33,15 +31,12 @@ function CanvasComponent({AppImageCollection,
 
     //#region EVENTS
     useEffect(() => {
-        document.addEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => {
-            translateImage(e.detail);
-            //CanvasActions.dispatchUpdateImagePosition(canvas, e.detail.id);
-        });
+        document.addEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) =>  translateImage(e.detail));
+        document.addEventListener(EVENT_ON_FORM_IMAGE_SCALE_CHANGED, (e) => scaleImage(e.detail));
 
         return() => {
-            document.addEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => {
-                translateImage(e.detail);
-            });
+            document.removeEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => translateImage(e.detail));
+            document.removeEventListener(EVENT_ON_FORM_IMAGE_SCALE_CHANGED, (e) => scaleImage(e.detail));
         }
     }, [canvas]);
 
@@ -55,15 +50,20 @@ function CanvasComponent({AppImageCollection,
     }, [canvas]);
 
     function onCanvasImageMoved(event){
-        // console.log("IMAGE IS BEING DRAGGED");
         CanvasActions.dispatchUpdateImagePosition(canvas, event.target.id);
     }
 
     useEffect(() => {
-        canvas?.on('object:scaling', function(event){
-            getImageScale(event.target.id);
-        });
+        canvas?.on('object:scaling', onCanvasImageScaled);
+
+        return() => {
+            canvas?.off('object:scaling', onCanvasImageScaled);
+        }
     }, [canvas]);
+
+    function onCanvasImageScaled(event){
+        CanvasActions.dispatchUpdateImageScale(canvas, event.target.id);
+    }
     //#endregion
 
     useEffect(() => {
@@ -163,7 +163,7 @@ function CanvasComponent({AppImageCollection,
             canvas.renderAll.bind(canvas);
 
             CanvasActions.dispatchUpdateImagePosition(canvas, imageID);
-            getImageScale(imageID);
+            CanvasActions.dispatchUpdateImageScale(canvas, imageID);
         } catch (error) { console.log("[CANVAS COMPONENT] COULDN'T ADD IMAGE TO CANVAS: " + error); }
     }
 
@@ -172,8 +172,7 @@ function CanvasComponent({AppImageCollection,
         const canvasImages = canvas.getObjects();
         if(canvasImages.length === 0) return; 
 
-        // console.log(`[CC] Repositioning image with data: ${JSON.stringify(eventData, null, 4)}`);
-        const imageID = eventData.id; 
+        const imageID = eventData.id;
         const positioning = eventData.positioning;
 
         canvasImages.map(imageObject => {
@@ -232,12 +231,14 @@ function CanvasComponent({AppImageCollection,
     // SCALE IMAGE
     function scaleImage(changes){
         if(canvas == null) return;
+        if(changes.id === null) return;
 
-        var scaleX = changes.scaleX;
-        var scaleY = changes.scaleY;
-        const imageID = changes.imageID;
+        const imageID = changes.id;
 
-        var currentImage;
+        let xScale = changes.scale.x;
+        let yScale = changes.scale.y;
+
+        let currentImage;
         const canvasImages = canvas.getObjects();
 
         canvasImages.map(imageObject => {
@@ -246,17 +247,20 @@ function CanvasComponent({AppImageCollection,
             {
                 currentImage = imageObject;
 
-                const currentScale = {"scaleX": currentImage.scaleX, "scaleY": currentImage.scaleY};
+                const currentScale = {"x": currentImage.scaleX, "y": currentImage.scaleY};
 
-                scaleX = scaleX === null ? currentScale.scaleX : parseFloat(scaleX);
-                scaleY = scaleY === null ? currentScale.scaleY : parseFloat(scaleY);
-                
-                currentImage.scaleX = scaleX;
-                currentImage.scaleY = scaleY;
+                xScale = (xScale === null || xScale === undefined) ? currentScale.x : parseFloat(xScale);
+                yScale = (yScale === null || yScale === undefined) ? currentScale.y : parseFloat(yScale);
 
-                setImageScale({"scaleX": currentImage.scaleX, "scaleY": currentImage.scaleY});
+                const scale = {"x": xScale, "y": yScale};
+
+                currentImage.scaleX = scale.x;
+                currentImage.scaleY = scale.y;
+
+                CanvasActions.dispatchUpdateImageScale(canvas, imageID)
 
                 currentImage.dirty = true;
+                canvas.renderAll();
             } 
         });
     }
