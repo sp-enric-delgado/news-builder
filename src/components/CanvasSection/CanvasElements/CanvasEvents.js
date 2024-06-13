@@ -2,6 +2,7 @@ export const EVENT_ON_CANVAS_GET_IMAGE_POSITION = "onCanvasGetImagePosition";
 export const EVENT_ON_CANVAS_IMAGE_SCALED = "onCanvasImageScaled";
 
 export function dispatchCanvasGetImagePosition(data) {
+    // console.log("[CanvasEvents] dispatchCanvasGetImagePosition with data ", data);
     document.dispatchEvent(new CustomEvent(EVENT_ON_CANVAS_GET_IMAGE_POSITION, {detail: data}));
 }
 

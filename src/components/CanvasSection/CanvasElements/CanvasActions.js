@@ -1,6 +1,5 @@
 import { fabric } from 'fabric';
-import {dispatchCanvasGetImagePosition, OnCanvasGetImagePosition, OnCanvasImageScaled} from "./CanvasEvents";
-import {get} from "axios";
+import {dispatchCanvasGetImagePosition, OnCanvasImageScaled} from "./CanvasEvents";
 
 export async function addImageToCanvas(canvas, imageFile, imageID){
     const imageURL = URL.createObjectURL(imageFile);
@@ -12,9 +11,13 @@ export async function addImageToCanvas(canvas, imageFile, imageID){
 
         const img = await fabricImageFromURL(imageURL);
 
-        if (isBackground) resizeCanvas(canvas, img.widht, img.height);
+        if (isBackground) resizeCanvas(canvas, img.width, img.height);
 
         img.setOptions({ left: 0, bottom: 0, scaleX: 1, scaleY: 1, selectable: !isBackground, id: imageID});
+
+        if(img.getHeight() > canvas.getHeight()){
+            img.scaleToHeight(canvas.getHeight);
+        }
 
         canvas.insertAt(img, imageIndex);
         canvas.renderAll.bind(canvas);
@@ -26,20 +29,24 @@ export async function addImageToCanvas(canvas, imageFile, imageID){
 
 export function getImagePosition(canvas, imageID){
     if(canvas === null) return;
-
     const canvasImages = canvas.getObjects();
-
     if(canvasImages.length === 0) return;
+
+    let data = {}
 
     canvasImages.map(imageObject => {
         if(imageObject.id === imageID)
         {
-            // setImagePos({"id": imageID, "pos": imageObject.getPointByOrigin('bottom', 'left')});
-            dispatchCanvasGetImagePosition({"id": imageID, "pos": imageObject.getPointByOrigin('bottom', 'left')});
+            data = {"id": imageID, "pos": imageObject.getPointByOrigin('bottom', 'left')};
         }
     });
 
-    canvas.renderAll();
+    return data;
+}
+
+export function dispatchUpdateImagePosition(canvas, imageID){
+    // console.log("[CanvasActions] dispatchUpdateImagePosition of image " + imageID);
+    dispatchCanvasGetImagePosition(getImagePosition(canvas, imageID));
 }
 
 function getImageScale(canvas, imageID){

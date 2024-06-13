@@ -4,6 +4,8 @@ import * as CanvasActions from './CanvasElements/CanvasActions'
 
 import '../../styles/CanvasComponent.css'
 import {dispatchCanvasGetImagePosition} from "./CanvasElements/CanvasEvents";
+import {EVENT_ON_FORM_IMAGE_POS_CHANGED, EVENT_ON_FORM_REQUEST_CANVAS_IMAGE_POS} from "./FormEvents/FormEvents";
+import {dispatchUpdateImagePosition, getImagePosition} from "./CanvasElements/CanvasActions";
 
 function CanvasComponent({AppImageCollection, 
                           OnImagePositionChanged, 
@@ -21,13 +23,48 @@ function CanvasComponent({AppImageCollection,
     const [canvas, setCanvas] = useState(null);
     const canvasRef = useRef();
 
-    const [imagePos, setImagePos] = useState(undefined);
     const [imageScale, setImageScale] = useState(undefined);
 
     const canvasDivStyle = {
         width: backgroundWidth,
         height: backgroundHeight
     };
+
+
+    //#region EVENTS
+    useEffect(() => {
+        document.addEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => {
+            translateImage(e.detail);
+            //CanvasActions.dispatchUpdateImagePosition(canvas, e.detail.id);
+        });
+
+        return() => {
+            document.addEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => {
+                translateImage(e.detail);
+            });
+        }
+    }, [canvas]);
+
+
+    useEffect(() => {
+        canvas?.on('object:moving', onCanvasImageMoved);
+
+        return() => {
+            canvas?.off('object:moving', onCanvasImageMoved);
+        }
+    }, [canvas]);
+
+    function onCanvasImageMoved(event){
+        // console.log("IMAGE IS BEING DRAGGED");
+        CanvasActions.dispatchUpdateImagePosition(canvas, event.target.id);
+    }
+
+    useEffect(() => {
+        canvas?.on('object:scaling', function(event){
+            getImageScale(event.target.id);
+        });
+    }, [canvas]);
+    //#endregion
 
     useEffect(() => {
         adjustImagePositioning(OnImageRepositionRequest)
@@ -40,22 +77,6 @@ function CanvasComponent({AppImageCollection,
         setBackgroundHeight(1);
         setBackgroundWidth(1);
     }, []);
-
-    /*
-        Each time an object in the canvas moves, notify everybody that needs to know its position
-    */
-    useEffect(() => {
-        canvas?.on('object:moving', function(event){
-            getImagePosition(event.target.id);
-            CanvasActions.getImagePosition(canvas, event.target.id);
-        });
-    }, [canvas]);
-
-    useEffect(() => {
-        canvas?.on('object:scaling', function(event){
-            getImageScale(event.target.id);
-        });
-    }, [canvas]);
 
     useEffect(() => {
         if (canvas == null) return;
@@ -78,26 +99,12 @@ function CanvasComponent({AppImageCollection,
     }, [AppImageCollection]);
 
     useEffect(() => {
-        translateImage(OnImagePositionChanged);
-    }, [OnImagePositionChanged]);
-
-    useEffect(() => {
         scaleImage(OnImageScaleChanged);
     }, [OnImageScaleChanged]);
 
     useEffect(() => {
-        getImagePosition(OnImagePosRequested);
-    }, [OnImagePosRequested])
-
-    useEffect(() => {
         getImageScale(OnImageScaleRequested);
     }, [OnImageScaleRequested])
-
-    useEffect(() => {
-        if(imagePos === undefined)  return; 
-        
-        OnSendImagePosition(imagePos);
-    }, [imagePos])
 
     useEffect(() => {
         if(imageScale === undefined)  return; 
@@ -109,13 +116,12 @@ function CanvasComponent({AppImageCollection,
         onSelectImage(OnImageSelectionRequest);
     }, [OnImageSelectionRequest])
 
-
     // PROCESS INCOMING IMAGE(S)
     function processImageCollection(imageCollection){
         if(canvas ===  null) return;
 
         for(const [id, image] of Object.entries(imageCollection)){
-            addImageToCanvas(image, id);
+             addImageToCanvas(image, id);
         }
     }
 
@@ -132,7 +138,7 @@ function CanvasComponent({AppImageCollection,
     }
 
     async function addImageToCanvas(imageFile, imageID){
-        const imageURL = await URL.createObjectURL(imageFile);
+        const imageURL = URL.createObjectURL(imageFile);
         canvas.clear();
 
         try{
@@ -140,18 +146,23 @@ function CanvasComponent({AppImageCollection,
             const imageIndex = isBackground ? 0 : -1;
 
             const img = await fabricImageFromURL(imageURL);;
-            
+
+            img.setOptions({ left: 0, bottom: 0, scaleX: 1, scaleY: 1, selectable: !isBackground, id: imageID});
+
             if (isBackground) {
                 setBackgroundWidth(img.width);
                 setBackgroundHeight(img.height);
             }
-
-            img.setOptions({ left: 0, bottom: 0, scaleX: 1, scaleY: 1, selectable: !isBackground, id: imageID});
+            else {
+                if(img.height > canvas.getHeight()){
+                    img.scaleToHeight(canvas.getHeight());
+                }
+            }
 
             canvas.insertAt(img, imageIndex);
             canvas.renderAll.bind(canvas);
 
-            getImagePosition(imageID);
+            CanvasActions.dispatchUpdateImagePosition(canvas, imageID);
             getImageScale(imageID);
         } catch (error) { console.log("[CANVAS COMPONENT] COULDN'T ADD IMAGE TO CANVAS: " + error); }
     }
@@ -182,13 +193,15 @@ function CanvasComponent({AppImageCollection,
 
     // MOVE IMAGE
     function translateImage(changes){
-        if(canvas == null) return;
+        if(canvas === null) return;
+        if(changes.id === null) return;
 
-        var xPos = changes.positionX;
-        var yPos = changes.positionY;
-        const imageID = changes.imageID;
+        const imageID = changes.id;
 
-        var currentImage;
+        let xPos = changes.pos.x;
+        let yPos = changes.pos.y;
+
+        let currentImage;
         const canvasImages = canvas.getObjects();
 
         canvasImages.map(imageObject => {
@@ -199,16 +212,17 @@ function CanvasComponent({AppImageCollection,
 
                 const currentPosition = currentImage.getPointByOrigin('bottom', 'left');
 
-                xPos = xPos === null ? currentPosition.x : parseInt(xPos);
-                yPos = yPos === null ? currentPosition.y : parseInt(yPos);
-                
+                xPos = (xPos === null || xPos === undefined) ? currentPosition.x : parseInt(xPos);
+                yPos = (yPos === null || yPos === undefined) ? currentPosition.y : parseInt(yPos);
+                const position = new fabric.Point(xPos, yPos);
+
                 currentImage.setPositionByOrigin(
-                    new fabric.Point(xPos, yPos),
+                    position,
                     'top',
                     'left'
                 );
 
-                setImagePos(currentImage.getPointByOrigin('bottom', 'left'));
+                CanvasActions.dispatchUpdateImagePosition(canvas, imageID);
 
                 canvas.renderAll();
             } 
@@ -245,23 +259,6 @@ function CanvasComponent({AppImageCollection,
                 currentImage.dirty = true;
             } 
         });
-    }
-
-    function getImagePosition(imageID){
-        if(canvas === null) return;
-
-        const canvasImages = canvas.getObjects();
-
-        if(canvasImages.length === 0) return; 
-
-        canvasImages.map(imageObject => {
-            if(imageObject.id === imageID)
-            {
-                setImagePos({"id": imageID, "pos": imageObject.getPointByOrigin('bottom', 'left')});
-            }
-        });
-
-        canvas.renderAll();
     }
 
     function getImageScale(imageID){
