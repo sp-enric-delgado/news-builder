@@ -17,6 +17,11 @@ export async function addImageToCanvas(canvas, imageFile, imageID){
 
         if(img.getHeight() > canvas.getHeight()){
             img.scaleToHeight(canvas.getHeight);
+
+            if(img.scaleX < 0.2 || img.scaleY < 0.2){
+                img.scaleX = 0.2;
+                img.scaleY = 0.2;
+            }
         }
 
         canvas.insertAt(img, imageIndex);

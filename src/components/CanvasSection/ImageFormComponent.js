@@ -1,18 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../styles/ImageFormComponent.css'
-import { json } from 'react-router-dom';
 import {EVENT_ON_CANVAS_GET_IMAGE_POSITION, EVENT_ON_CANVAS_GET_IMAGE_SCALE} from "./CanvasElements/CanvasEvents";
 import * as FormEvent from './FormEvents/FormEvents'
 
 function ImageFormComponent({ProjectName, 
                              Template, 
-                             OnCollectionUpdated, 
-                             OnImagePositionChanged, 
-                             OnRetrieveImagePos, 
-                             OnImagePosRetrieved, 
-                             OnImageScaleChanged, 
-                             OnRetrieveImageScale, 
-                             OnImageScaleRetrieved, 
+                             OnCollectionUpdated,
                              OnImageRepositionRequest, 
                              OnImageSelectionRequest}) 
 {
@@ -25,6 +18,8 @@ function ImageFormComponent({ProjectName,
     const [imageRepositionData, setImageRepositionData] = useState({});
     const [imageSelectionData, setImageSelectionData] = useState("");
 
+    //#region EVENT SUBSCRIPTION
+    // Update Image Position
     useState(() => {
         document.addEventListener(EVENT_ON_CANVAS_GET_IMAGE_POSITION, (e) => updateImagePositionValue(e.detail));
 
@@ -33,6 +28,7 @@ function ImageFormComponent({ProjectName,
         }
     }, [imagePositionDict])
 
+    // Update Image Scale
     useState(() => {
         document.addEventListener(EVENT_ON_CANVAS_GET_IMAGE_SCALE, (e) => updateImageScaleValue(e.detail));
 
@@ -40,7 +36,9 @@ function ImageFormComponent({ProjectName,
             document.removeEventListener(EVENT_ON_CANVAS_GET_IMAGE_SCALE, (e) => updateImageScaleValue(e.detail));
         }
     }, [imageScaleDict])
+    //#endregion
 
+    // Fetching the DB  to get the template's data
     useEffect(() => {
       fetch(`http://localhost:3001/templates?projectName=${encodeURIComponent(ProjectName)}`)
       .then((response) => response.json())
@@ -54,6 +52,7 @@ function ImageFormComponent({ProjectName,
       });
     }, [Template])
 
+    // THIS IS CANVAS DATA THAT COULD BE
     useEffect(() => {
       if(imageRepositionData === undefined) return
 

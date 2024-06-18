@@ -5,13 +5,7 @@ import * as CanvasActions from './CanvasElements/CanvasActions'
 import '../../styles/CanvasComponent.css'
 import {EVENT_ON_FORM_IMAGE_POS_CHANGED, EVENT_ON_FORM_IMAGE_SCALE_CHANGED} from "./FormEvents/FormEvents";
 
-function CanvasComponent({AppImageCollection, 
-                          OnImagePositionChanged, 
-                          OnImagePosRequested, 
-                          OnSendImagePosition, 
-                          OnImageScaleChanged, 
-                          OnImageScaleRequested, 
-                          OnSendImageScale, 
+function CanvasComponent({AppImageCollection,
                           OnImageRepositionRequest,
                           OnImageSelectionRequest}) 
 {
@@ -21,7 +15,7 @@ function CanvasComponent({AppImageCollection,
     const [canvas, setCanvas] = useState(null);
     const canvasRef = useRef();
 
-    const [imageScale, setImageScale] = useState(undefined);
+    // const [imageScale, setImageScale] = useState(undefined);
 
     const canvasDivStyle = {
         width: backgroundWidth,
@@ -98,19 +92,6 @@ function CanvasComponent({AppImageCollection,
         processImageCollection(AppImageCollection);
     }, [AppImageCollection]);
 
-    useEffect(() => {
-        scaleImage(OnImageScaleChanged);
-    }, [OnImageScaleChanged]);
-
-    useEffect(() => {
-        getImageScale(OnImageScaleRequested);
-    }, [OnImageScaleRequested])
-
-    useEffect(() => {
-        if(imageScale === undefined)  return; 
-
-        OnSendImageScale(imageScale);
-    }, [imageScale])
 
     useEffect(() => {
         onSelectImage(OnImageSelectionRequest);
@@ -263,31 +244,6 @@ function CanvasComponent({AppImageCollection,
                 canvas.renderAll();
             } 
         });
-    }
-
-    function getImageScale(imageID){
-        if(canvas === null) return;
-
-        const canvasImages = canvas.getObjects();
-
-        if(canvasImages.length === 0) return; 
-
-        canvasImages.map(imageObject => {
-            if(imageObject.id === imageID)
-            {
-                const scaleObj = {
-                    "id": imageID, 
-                    "scale": {
-                        "scaleX": imageObject.scaleX, 
-                        "scaleY": imageObject.scaleY
-                    }
-                }
-                
-                setImageScale(scaleObj);
-            }
-        });
-
-        canvas.renderAll();
     }
 
     function handleProcessImages(){

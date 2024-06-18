@@ -12,11 +12,6 @@ function CanvasSection(){
   const [composition, setComposition] = useState([]);
   const [currentTemplate, setCurrentTemplate] = useState();
 
-  const [imageID, setImageID] = useState("");
-  const [imagePosition, setImagePosition] = useState({});
-  const [positionedImage, setPositionedImage] = useState({});
-  const [imageScale, setImageScale] = useState(undefined);
-  const [scaledImage, setScaledImage] = useState({});
   const [repositionRequest, setRepositionRequest] = useState({});
   const [selectionRequest, setSelectionRequest] = useState("");
 
@@ -30,13 +25,7 @@ function CanvasSection(){
       
       <div className='pageBody'>
         <div className='pageBody-left'>
-          <CanvasComponent AppImageCollection={composition} 
-                           OnImagePositionChanged={positionedImage}
-                           OnImagePosRequested={imageID}
-                           OnSendImagePosition={setImagePosition}
-                           OnImageScaleChanged={scaledImage}
-                           OnImageScaleRequested={imageID}
-                           OnSendImageScale={setImageScale}
+          <CanvasComponent AppImageCollection={composition}
                            OnImageRepositionRequest={repositionRequest}
                            OnImageSelectionRequest={selectionRequest}
           /> 
@@ -47,12 +36,6 @@ function CanvasSection(){
           <ImageFormComponent ProjectName={projectName} 
                               Template={currentTemplate}
                               OnCollectionUpdated={setComposition}
-                              OnImagePositionChanged={setPositionedImage}
-                              OnRetrieveImagePos={setImageID}
-                              OnImagePosRetrieved={imagePosition}
-                              OnImageScaleChanged={setScaledImage}
-                              OnRetrieveImageScale={setImageID}
-                              OnImageScaleRetrieved={imageScale}
                               OnImageRepositionRequest={setRepositionRequest}
                               OnImageSelectionRequest={setSelectionRequest}
           />
