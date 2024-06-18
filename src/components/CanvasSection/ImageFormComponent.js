@@ -237,10 +237,12 @@ function ImageFormComponent({ProjectName,
               <div>
                 {generateInputFields()}
               </div>
-              
-              <div>
-                <button onClick={() => { OnCollectionUpdated(imageCollection); }}>Render</button>
-              </div>
+
+                <div>
+                    {/*<button onClick={() => { OnCollectionUpdated(imageCollection); }}> Render </button>*/}
+                    <button onClick={() => FormEvent.dispatchEventOnFormRenderRequest(imageCollection)}> Render </button>
+
+                </div>
             </div>
         </div>
     );

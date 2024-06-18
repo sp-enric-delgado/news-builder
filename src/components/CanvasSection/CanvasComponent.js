@@ -3,7 +3,11 @@ import { fabric } from 'fabric';
 import * as CanvasActions from './CanvasElements/CanvasActions'
 
 import '../../styles/CanvasComponent.css'
-import {EVENT_ON_FORM_IMAGE_POS_CHANGED, EVENT_ON_FORM_IMAGE_SCALE_CHANGED} from "./FormEvents/FormEvents";
+import {
+    EVENT_ON_FORM_IMAGE_POS_CHANGED,
+    EVENT_ON_FORM_IMAGE_SCALE_CHANGED,
+    EVENT_ON_FORM_RENDER_REQUEST
+} from "./FormEvents/FormEvents";
 
 function CanvasComponent({AppImageCollection,
                           OnImageRepositionRequest,
@@ -15,8 +19,6 @@ function CanvasComponent({AppImageCollection,
     const [canvas, setCanvas] = useState(null);
     const canvasRef = useRef();
 
-    // const [imageScale, setImageScale] = useState(undefined);
-
     const canvasDivStyle = {
         width: backgroundWidth,
         height: backgroundHeight
@@ -24,9 +26,11 @@ function CanvasComponent({AppImageCollection,
 
 
     //#region EVENTS
+    // Listening to events for when the FORM values change
     useEffect(() => {
         document.addEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) =>  translateImage(e.detail));
         document.addEventListener(EVENT_ON_FORM_IMAGE_SCALE_CHANGED, (e) => scaleImage(e.detail));
+        document.addEventListener(EVENT_ON_FORM_RENDER_REQUEST, (e) => processImageCollection(e.detail));
 
         return() => {
             document.removeEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => translateImage(e.detail));
@@ -34,7 +38,7 @@ function CanvasComponent({AppImageCollection,
         }
     }, [canvas]);
 
-
+    // Checking when an object inside the canvas is being dragged
     useEffect(() => {
         canvas?.on('object:moving', onCanvasImageMoved);
 
@@ -42,11 +46,11 @@ function CanvasComponent({AppImageCollection,
             canvas?.off('object:moving', onCanvasImageMoved);
         }
     }, [canvas]);
-
     function onCanvasImageMoved(event){
         CanvasActions.dispatchUpdateImagePosition(canvas, event.target.id);
     }
 
+    // Checking when an object inside the canvas is being scaled
     useEffect(() => {
         canvas?.on('object:scaling', onCanvasImageScaled);
 
@@ -54,7 +58,6 @@ function CanvasComponent({AppImageCollection,
             canvas?.off('object:scaling', onCanvasImageScaled);
         }
     }, [canvas]);
-
     function onCanvasImageScaled(event){
         CanvasActions.dispatchUpdateImageScale(canvas, event.target.id);
     }
@@ -64,6 +67,7 @@ function CanvasComponent({AppImageCollection,
         adjustImagePositioning(OnImageRepositionRequest)
     }, [OnImageRepositionRequest])
 
+    //#region CANVAS RESIZING
     useEffect(() => {
         var cnv = new fabric.Canvas(canvasRef.current);
         setCanvas(cnv);
@@ -87,23 +91,25 @@ function CanvasComponent({AppImageCollection,
         canvas.renderAll.bind(canvas);
         
     }, [backgroundHeight]);
-
-    useEffect(() => {
-        processImageCollection(AppImageCollection);
-    }, [AppImageCollection]);
-
+    //#endregion
 
     useEffect(() => {
         onSelectImage(OnImageSelectionRequest);
     }, [OnImageSelectionRequest])
 
+
     // PROCESS INCOMING IMAGE(S)
-    function processImageCollection(imageCollection){
+    async function processImageCollection(imageCollection){
         if(canvas ===  null) return;
+        canvas.clear();
 
         for(const [id, image] of Object.entries(imageCollection)){
-             addImageToCanvas(image, id);
+            console.log("adding image ot canvas", image);
+             await addImageToCanvas(image, id);
         }
+
+        canvas.renderAll.bind(canvas);
+        console.log("finished adding images");
     }
 
     async function fabricImageFromURL(image_url) {                                                                          
@@ -120,13 +126,12 @@ function CanvasComponent({AppImageCollection,
 
     async function addImageToCanvas(imageFile, imageID){
         const imageURL = URL.createObjectURL(imageFile);
-        canvas.clear();
 
         try{
             const isBackground = imageID === "background";
-            const imageIndex = isBackground ? 0 : -1;
+            const imageIndex = isBackground ? 0 : 1;
 
-            const img = await fabricImageFromURL(imageURL);;
+            const img = await fabricImageFromURL(imageURL);
 
             img.setOptions({ left: 0, bottom: 0, scaleX: 1, scaleY: 1, selectable: !isBackground, id: imageID});
 
@@ -141,7 +146,6 @@ function CanvasComponent({AppImageCollection,
             }
 
             canvas.insertAt(img, imageIndex);
-            canvas.renderAll.bind(canvas);
 
             CanvasActions.dispatchUpdateImagePosition(canvas, imageID);
             CanvasActions.dispatchUpdateImageScale(canvas, imageID);
