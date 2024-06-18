@@ -9,8 +9,7 @@ import {
     EVENT_ON_FORM_RENDER_REQUEST
 } from "./FormEvents/FormEvents";
 
-function CanvasComponent({AppImageCollection,
-                          OnImageRepositionRequest,
+function CanvasComponent({OnImageRepositionRequest,
                           OnImageSelectionRequest}) 
 {
     const [backgroundWidth, setBackgroundWidth] = useState(0);

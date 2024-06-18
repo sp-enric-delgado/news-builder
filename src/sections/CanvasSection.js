@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import '../styles/CanvasSection.css'
@@ -8,10 +8,9 @@ import DropdownComponent from '../components/CanvasSection/DropdownComponent.js'
 
 function CanvasSection(){
   const location = useLocation();
-  const [projectName, setProjectName] = useState(location.state?.projectName);
-  const [composition, setComposition] = useState([]);
-  const [currentTemplate, setCurrentTemplate] = useState();
+  const projectName = location.state?.projectName;
 
+  const [currentTemplate, setCurrentTemplate] = useState();
   const [repositionRequest, setRepositionRequest] = useState({});
   const [selectionRequest, setSelectionRequest] = useState("");
 
@@ -25,8 +24,7 @@ function CanvasSection(){
       
       <div className='pageBody'>
         <div className='pageBody-left'>
-          <CanvasComponent AppImageCollection={composition}
-                           OnImageRepositionRequest={repositionRequest}
+          <CanvasComponent OnImageRepositionRequest={repositionRequest}
                            OnImageSelectionRequest={selectionRequest}
           /> 
         </div>
@@ -35,7 +33,6 @@ function CanvasSection(){
           <DropdownComponent ProjectName={projectName}  OnSelectedTemplate={setCurrentTemplate}/>
           <ImageFormComponent ProjectName={projectName} 
                               Template={currentTemplate}
-                              OnCollectionUpdated={setComposition}
                               OnImageRepositionRequest={setRepositionRequest}
                               OnImageSelectionRequest={setSelectionRequest}
           />
@@ -43,6 +40,6 @@ function CanvasSection(){
       </div>
     </div>
   );
-};
+}
 
 export default CanvasSection;

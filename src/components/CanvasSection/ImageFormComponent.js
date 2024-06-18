@@ -5,8 +5,7 @@ import * as FormEvent from './FormEvents/FormEvents'
 
 function ImageFormComponent({ProjectName, 
                              Template, 
-                             OnCollectionUpdated,
-                             OnImageRepositionRequest, 
+                             OnImageRepositionRequest,
                              OnImageSelectionRequest}) 
 {
 
