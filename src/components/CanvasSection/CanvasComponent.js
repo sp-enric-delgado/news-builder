@@ -95,7 +95,7 @@ function CanvasComponent()
     }, [backgroundHeight]);
     //#endregion
 
-    //#region IMAGE PROCESSING FUNCTIONS -- coudld this be in an external class?
+    //#region IMAGE PROCESSING FUNCTIONS
     async function processImageCollection(imageCollection){
         if(canvas ===  null) return;
         canvas.clear();
@@ -149,7 +149,7 @@ function CanvasComponent()
         } catch (error) { console.log("[CANVAS COMPONENT] COULDN'T ADD IMAGE TO CANVAS: " + error); }
     }
 
-    function handleProcessImages(){
+    function handleDownloadImage(){
         if (canvas) {
             canvas.requestRenderAll();
             const dataURL = canvas.toDataURL('image/png');
@@ -161,7 +161,7 @@ function CanvasComponent()
     }
     //#endregion
 
-    //#region IMAGE MANIPULATION METHODS
+    //#region IMAGE MANIPULATION METHODS -- coudld this be in an external class?
     function translateImage(changes){
         if(canvas === null) return;
         if(changes.id === null) return;
@@ -304,7 +304,7 @@ function CanvasComponent()
             <canvas ref={canvasRef} className='canvasElement'/>
           </div>
 
-          <button onClick={handleProcessImages}>Process Images</button>
+          <button onClick={handleDownloadImage}>Download Image</button>
         </div>
     );
 }
