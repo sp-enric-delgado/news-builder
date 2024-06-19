@@ -102,13 +102,13 @@ function CanvasComponent({OnImageRepositionRequest,
         if(canvas ===  null) return;
         canvas.clear();
 
-        for(const [id, image] of Object.entries(imageCollection)){
-            console.log("adding image ot canvas", image);
-             await addImageToCanvas(image, id);
+        console.log(imageCollection);
+
+        for(const [id, value] of Object.entries(imageCollection)){
+             await addImageToCanvas(value.file, id, value.index);
         }
 
-        canvas.renderAll.bind(canvas);
-        console.log("finished adding images");
+        //canvas.renderAll.bind(canvas);
     }
 
     async function fabricImageFromURL(image_url) {                                                                          
@@ -123,12 +123,12 @@ function CanvasComponent({OnImageRepositionRequest,
         });                                                                                                                   
     }
 
-    async function addImageToCanvas(imageFile, imageID){
+    async function addImageToCanvas(imageFile, imageID, index){
         const imageURL = URL.createObjectURL(imageFile);
 
         try{
             const isBackground = imageID === "background";
-            const imageIndex = isBackground ? 0 : 1;
+            //const imageIndex = isBackground ? 0 : 1;
 
             const img = await fabricImageFromURL(imageURL);
 
@@ -144,7 +144,7 @@ function CanvasComponent({OnImageRepositionRequest,
                 }
             }
 
-            canvas.insertAt(img, imageIndex);
+            canvas.insertAt(img, index);
 
             CanvasActions.dispatchUpdateImagePosition(canvas, imageID);
             CanvasActions.dispatchUpdateImageScale(canvas, imageID);

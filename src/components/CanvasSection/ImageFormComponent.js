@@ -63,14 +63,19 @@ function ImageFormComponent({ProjectName,
     }, [imageSelectionData])
 
 
-    function handleImageUpload(event){
+    function handleImageUpload(event, index){
         const uploadedImageFile = event.target.files[0];
         const imageID = event.target.id;
-        
+
         const newCollection = {
             ...imageCollection,
-            [imageID]: uploadedImageFile
+            [imageID]: {
+                "file": uploadedImageFile,
+                "index": index
+            }
         };
+
+        console.log(imageID + " with index " + index);
         
         updateImageCollection(newCollection);
     }
@@ -153,7 +158,7 @@ function ImageFormComponent({ProjectName,
                       <h3>{item.name}</h3>
                         <div>
                           <label htmlFor={item.id}>Image: </label>
-                          <input id={item.id} type='file' accept='*.png' onChange={handleImageUpload}/>
+                          <input id={item.id} type='file' accept='*.png' onChange={ (e) => handleImageUpload(e, index)}/>
                         </div>
                         { item.id !== "background" && 
                           <div className='components'>
