@@ -5,8 +5,7 @@ import * as FormEvent from './FormEvents/FormEvents'
 
 function ImageFormComponent({ProjectName, 
                              Template, 
-                             OnImageRepositionRequest,
-                             OnImageSelectionRequest}) 
+                             OnImageRepositionRequest})
 {
 
     const [imageCollection, updateImageCollection] = useState({});
@@ -57,10 +56,6 @@ function ImageFormComponent({ProjectName,
 
       OnImageRepositionRequest(imageRepositionData);
     }, [imageRepositionData])
-
-    useEffect(() => { 
-      OnImageSelectionRequest(imageSelectionData);
-    }, [imageSelectionData])
 
 
     function handleImageUpload(event, index){
@@ -126,7 +121,9 @@ function ImageFormComponent({ProjectName,
     function onImageSelect(itemID){
       if(itemID === null || itemID === "") return;
 
-      setImageSelectionData(itemID);
+      //setImageSelectionData(itemID);
+
+      FormEvent.dispatchEventOnFormImageSelected(itemID);
     }
 
     function updateImagePositionValue(data){

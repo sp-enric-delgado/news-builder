@@ -5,12 +5,11 @@ import * as CanvasActions from './CanvasElements/CanvasActions'
 import '../../styles/CanvasComponent.css'
 import {
     EVENT_ON_FORM_IMAGE_POS_CHANGED,
-    EVENT_ON_FORM_IMAGE_SCALE_CHANGED,
+    EVENT_ON_FORM_IMAGE_SCALE_CHANGED, EVENT_ON_FORM_IMAGE_SELECTED,
     EVENT_ON_FORM_RENDER_REQUEST
 } from "./FormEvents/FormEvents";
 
-function CanvasComponent({OnImageRepositionRequest,
-                          OnImageSelectionRequest}) 
+function CanvasComponent({OnImageRepositionRequest})
 {
     const [backgroundWidth, setBackgroundWidth] = useState(0);
     const [backgroundHeight, setBackgroundHeight] = useState(0);
@@ -30,6 +29,7 @@ function CanvasComponent({OnImageRepositionRequest,
         document.addEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) =>  translateImage(e.detail));
         document.addEventListener(EVENT_ON_FORM_IMAGE_SCALE_CHANGED, (e) => scaleImage(e.detail));
         document.addEventListener(EVENT_ON_FORM_RENDER_REQUEST, (e) => processImageCollection(e.detail));
+        document.addEventListener(EVENT_ON_FORM_IMAGE_SELECTED, (e) =>  onSelectImage(e.detail));
 
         return() => {
             document.removeEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => translateImage(e.detail));
@@ -91,10 +91,6 @@ function CanvasComponent({OnImageRepositionRequest,
         
     }, [backgroundHeight]);
     //#endregion
-
-    useEffect(() => {
-        onSelectImage(OnImageSelectionRequest);
-    }, [OnImageSelectionRequest])
 
 
     // PROCESS INCOMING IMAGE(S)
