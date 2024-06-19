@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ImCross } from "react-icons/im";
 
 import UploadFileModalSection from './UploadFileModalSection';
@@ -7,7 +7,6 @@ import '../../../styles/Modal/LoadTemplateModal.css'
 function LoadTemplateModal({setOpenModal, onNewTemplateAdded, projectName}){
     
     const [template, setTemplate] = useState({});
-    //const [projectName, setProjectName] = useState('MYPROJECT');
 
     function handleDroppedFile(){
         saveTemplate(template);

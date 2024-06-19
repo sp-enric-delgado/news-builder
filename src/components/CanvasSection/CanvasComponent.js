@@ -10,7 +10,7 @@ import {
     EVENT_ON_FORM_RENDER_REQUEST
 } from "./FormEvents/FormEvents";
 
-function CanvasComponent({OnImageRepositionRequest})
+function CanvasComponent()
 {
     const [backgroundWidth, setBackgroundWidth] = useState(0);
     const [backgroundHeight, setBackgroundHeight] = useState(0);
@@ -69,10 +69,6 @@ function CanvasComponent({OnImageRepositionRequest})
     }
     //#endregion
 
-    // useEffect(() => {
-    //     adjustImagePositioning(OnImageRepositionRequest)
-    // }, [OnImageRepositionRequest])
-
     //#region CANVAS RESIZING
     useEffect(() => {
         var cnv = new fabric.Canvas(canvasRef.current);
@@ -99,8 +95,7 @@ function CanvasComponent({OnImageRepositionRequest})
     }, [backgroundHeight]);
     //#endregion
 
-
-    // PROCESS INCOMING IMAGE(S)
+    //#region IMAGE PROCESSING FUNCTIONS -- coudld this be in an external class?
     async function processImageCollection(imageCollection){
         if(canvas ===  null) return;
         canvas.clear();
@@ -154,30 +149,19 @@ function CanvasComponent({OnImageRepositionRequest})
         } catch (error) { console.log("[CANVAS COMPONENT] COULDN'T ADD IMAGE TO CANVAS: " + error); }
     }
 
-    function adjustImagePositioning(eventData){
-        if(canvas === null) return;
-        const canvasImages = canvas.getObjects();
-        if(canvasImages.length === 0) return; 
-
-        const imageID = eventData.id;
-        const positioning = eventData.positioning;
-
-        canvasImages.map(imageObject => {
-            if(imageObject.id === imageID)
-            {
-                if(positioning === "Backwards"){
-                    canvas.sendBackwards(imageObject);
-                }
-                else{
-                    canvas.bringForward(imageObject);
-                }
-            }
-        });
-
-        canvas.renderAll();
+    function handleProcessImages(){
+        if (canvas) {
+            canvas.requestRenderAll();
+            const dataURL = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'test';
+            a.click();
+        }
     }
+    //#endregion
 
-    // MOVE IMAGE
+    //#region IMAGE MANIPULATION METHODS
     function translateImage(changes){
         if(canvas === null) return;
         if(changes.id === null) return;
@@ -216,7 +200,6 @@ function CanvasComponent({OnImageRepositionRequest})
         });
     }
 
-    // SCALE IMAGE
     function scaleImage(changes){
         if(canvas == null) return;
         if(changes.id === null) return;
@@ -253,15 +236,27 @@ function CanvasComponent({OnImageRepositionRequest})
         });
     }
 
-    function handleProcessImages(){
-        if (canvas) {
-            canvas.requestRenderAll();
-            const dataURL = canvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = 'test';
-            a.click();
-        }
+    function adjustImagePositioning(eventData){
+        if(canvas === null) return;
+        const canvasImages = canvas.getObjects();
+        if(canvasImages.length === 0) return;
+
+        const imageID = eventData.id;
+        const positioning = eventData.positioning;
+
+        canvasImages.map(imageObject => {
+            if(imageObject.id === imageID)
+            {
+                if(positioning === "Backwards"){
+                    canvas.sendBackwards(imageObject);
+                }
+                else{
+                    canvas.bringForward(imageObject);
+                }
+            }
+        });
+
+        canvas.renderAll();
     }
 
     function onSelectImage(itemID){
@@ -299,6 +294,7 @@ function CanvasComponent({OnImageRepositionRequest})
 
         canvas.renderAll();
     }
+    //#endregion
 
     return(
         <div className='canvasSection'>

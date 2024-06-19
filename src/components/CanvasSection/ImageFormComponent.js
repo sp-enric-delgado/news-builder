@@ -3,18 +3,14 @@ import '../../styles/ImageFormComponent.css'
 import {EVENT_ON_CANVAS_GET_IMAGE_POSITION, EVENT_ON_CANVAS_GET_IMAGE_SCALE} from "./CanvasElements/CanvasEvents";
 import * as FormEvent from './FormEvents/FormEvents'
 
-function ImageFormComponent({ProjectName, 
-                             Template, 
-                             OnImageRepositionRequest})
-{
+function ImageFormComponent({ProjectName, Template}) {
 
     const [imageCollection, updateImageCollection] = useState({});
     const [templateContent, setTemplateContent] = useState([]);
 
     const [imagePositionDict, setImagePositionDict] = useState({});
     const [imageScaleDict, setImageScaleDict] = useState({});
-    const [imageRepositionData, setImageRepositionData] = useState({});
-    const [imageSelectionData, setImageSelectionData] = useState("");
+
 
     //#region EVENT SUBSCRIPTION
     // Update Image Position
@@ -50,13 +46,6 @@ function ImageFormComponent({ProjectName,
       });
     }, [Template])
 
-    // THIS IS CANVAS DATA THAT COULD BE
-    useEffect(() => {
-      if(imageRepositionData === undefined) return
-
-      OnImageRepositionRequest(imageRepositionData);
-    }, [imageRepositionData])
-
 
     function handleImageUpload(event, index){
         const uploadedImageFile = event.target.files[0];
@@ -70,8 +59,6 @@ function ImageFormComponent({ProjectName,
             }
         };
 
-        console.log(imageID + " with index " + index);
-        
         updateImageCollection(newCollection);
     }
 
@@ -115,14 +102,11 @@ function ImageFormComponent({ProjectName,
         "positioning": positioning
       }
 
-      // setImageRepositionData(repositionData);
       FormEvent.dispatchEventOnFormImageRepositioned(repositionData);
     } 
 
     function onImageSelect(itemID){
       if(itemID === null || itemID === "") return;
-
-      //setImageSelectionData(itemID);
 
       FormEvent.dispatchEventOnFormImageSelected(itemID);
     }
@@ -259,9 +243,7 @@ function ImageFormComponent({ProjectName,
               </div>
 
                 <div>
-                    {/*<button onClick={() => { OnCollectionUpdated(imageCollection); }}> Render </button>*/}
                     <button onClick={() => FormEvent.dispatchEventOnFormRenderRequest(imageCollection)}> Render </button>
-
                 </div>
             </div>
         </div>

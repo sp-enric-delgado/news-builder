@@ -11,7 +11,6 @@ function CanvasSection(){
   const projectName = location.state?.projectName;
 
   const [currentTemplate, setCurrentTemplate] = useState();
-  const [repositionRequest, setRepositionRequest] = useState({});
 
 
   return (
@@ -23,15 +22,13 @@ function CanvasSection(){
       
       <div className='pageBody'>
         <div className='pageBody-left'>
-          <CanvasComponent OnImageRepositionRequest={repositionRequest}
-          /> 
+          <CanvasComponent />
         </div>
 
         <div className='pageBody-right'>
           <DropdownComponent ProjectName={projectName}  OnSelectedTemplate={setCurrentTemplate}/>
           <ImageFormComponent ProjectName={projectName} 
                               Template={currentTemplate}
-                              OnImageRepositionRequest={setRepositionRequest}
           />
         </div>
       </div>
