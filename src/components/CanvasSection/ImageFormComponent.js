@@ -126,6 +126,12 @@ function ImageFormComponent({ProjectName,
       FormEvent.dispatchEventOnFormImageSelected(itemID);
     }
 
+    function onImageDeselect(itemID){
+        if(itemID === null || itemID === "") return;
+
+        FormEvent.dispatchEventOnFormImageDeselected(itemID);
+    }
+
     function updateImagePositionValue(data){
         const newImagePositionDict = {...imagePositionDict};
         newImagePositionDict[data.id] = data.pos;
@@ -203,18 +209,30 @@ function ImageFormComponent({ProjectName,
                               </div>
                             </div>
 
-                            <div className='selection-component'>
-                              <label htmlFor="selection-button">Select Object</label>
-                              <button className="selected" id="selection-button" onClick={(event) => onImageSelect(item.id)}>Select</button>
-                            </div>
+                              <div className='selection-component'>
+                                  <div className='selection-button--container'>
+                                      <label htmlFor="selection-button">Select Object</label>
+                                      <button className="selected" id="selection-button"
+                                              onClick={(event) => onImageSelect(item.id)}>Select
+                                      </button>
+                                  </div>
 
-                            <div>
+                                  <div className='deselection-button--container'>
+                                      <label htmlFor="deselection-button">Deselect Object</label>
+                                      <button className="selected" id="deselection-button"
+                                              onClick={(event) => onImageDeselect(item.id)}>Deselect
+                                      </button>
+                                  </div>
 
-                            </div>
+                              </div>
+
+                              <div>
+
+                              </div>
                           </div>
                         }
                         <div>
-                          <hr />
+                            <hr/>
                         </div>
                     </div>
                   </div>

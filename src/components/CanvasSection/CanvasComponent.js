@@ -4,6 +4,7 @@ import * as CanvasActions from './CanvasElements/CanvasActions'
 
 import '../../styles/CanvasComponent.css'
 import {
+    EVENT_ON_FORM_IMAGE_DESELECTED,
     EVENT_ON_FORM_IMAGE_POS_CHANGED,
     EVENT_ON_FORM_IMAGE_SCALE_CHANGED, EVENT_ON_FORM_IMAGE_SELECTED,
     EVENT_ON_FORM_RENDER_REQUEST
@@ -30,6 +31,7 @@ function CanvasComponent({OnImageRepositionRequest})
         document.addEventListener(EVENT_ON_FORM_IMAGE_SCALE_CHANGED, (e) => scaleImage(e.detail));
         document.addEventListener(EVENT_ON_FORM_RENDER_REQUEST, (e) => processImageCollection(e.detail));
         document.addEventListener(EVENT_ON_FORM_IMAGE_SELECTED, (e) =>  onSelectImage(e.detail));
+        document.addEventListener(EVENT_ON_FORM_IMAGE_DESELECTED, (e) => onDeselectImage(e.detail));
 
         return() => {
             document.removeEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => translateImage(e.detail));
@@ -268,6 +270,24 @@ function CanvasComponent({OnImageRepositionRequest})
         canvasImages.map(imageObject => {
             if(imageObject.id === itemID){
                 canvas.setActiveObject(imageObject);
+                imageObject.dirty = true;
+            }
+        })
+
+        canvas.renderAll();
+    }
+
+    function onDeselectImage(itemID){
+        if(canvas === null) return;
+        if(itemID === null || itemID === "") return;
+
+        const canvasImages = canvas.getObjects();
+
+        if(canvasImages.length === 0) return;
+
+        canvasImages.map(imageObject => {
+            if(imageObject.id === itemID){
+                canvas.discardActiveObject(imageObject);
                 imageObject.dirty = true;
             }
         })
