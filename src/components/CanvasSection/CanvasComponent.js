@@ -36,6 +36,9 @@ function CanvasComponent({OnImageRepositionRequest})
         return() => {
             document.removeEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => translateImage(e.detail));
             document.removeEventListener(EVENT_ON_FORM_IMAGE_SCALE_CHANGED, (e) => scaleImage(e.detail));
+            document.removeEventListener(EVENT_ON_FORM_RENDER_REQUEST, (e) => processImageCollection(e.detail));
+            document.removeEventListener(EVENT_ON_FORM_IMAGE_SELECTED, (e) =>  onSelectImage(e.detail));
+            document.removeEventListener(EVENT_ON_FORM_IMAGE_DESELECTED, (e) => onDeselectImage(e.detail));
         }
     }, [canvas]);
 
