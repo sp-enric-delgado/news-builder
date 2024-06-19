@@ -3,6 +3,7 @@ export const EVENT_ON_FORM_IMAGE_SCALE_CHANGED = "onFormImageScaleChanged";
 export const EVENT_ON_FORM_RENDER_REQUEST = "onFormRenderRequest";
 export const EVENT_ON_FORM_IMAGE_SELECTED = "onFormImageSelected";
 export const EVENT_ON_FORM_IMAGE_DESELECTED = "onFormImageDeselected";
+export const EVENT_ON_FORM_IMAGE_REPOSITIONED = "onFormImageRepositioned";
 
 export function dispatchEventOnFormImagePosChanged(data){
     document.dispatchEvent(new CustomEvent(EVENT_ON_FORM_IMAGE_POS_CHANGED, {detail: data}));
@@ -22,4 +23,8 @@ export function dispatchEventOnFormImageSelected(data){
 
 export function dispatchEventOnFormImageDeselected(data){
     document.dispatchEvent(new CustomEvent(EVENT_ON_FORM_IMAGE_DESELECTED, {detail: data}));
+}
+
+export function dispatchEventOnFormImageRepositioned(data){
+    document.dispatchEvent(new CustomEvent(EVENT_ON_FORM_IMAGE_REPOSITIONED, {detail: data}));
 }

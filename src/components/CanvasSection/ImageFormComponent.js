@@ -115,7 +115,8 @@ function ImageFormComponent({ProjectName,
         "positioning": positioning
       }
 
-      setImageRepositionData(repositionData);
+      // setImageRepositionData(repositionData);
+      FormEvent.dispatchEventOnFormImageRepositioned(repositionData);
     } 
 
     function onImageSelect(itemID){

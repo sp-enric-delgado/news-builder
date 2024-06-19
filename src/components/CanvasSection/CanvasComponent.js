@@ -5,7 +5,7 @@ import * as CanvasActions from './CanvasElements/CanvasActions'
 import '../../styles/CanvasComponent.css'
 import {
     EVENT_ON_FORM_IMAGE_DESELECTED,
-    EVENT_ON_FORM_IMAGE_POS_CHANGED,
+    EVENT_ON_FORM_IMAGE_POS_CHANGED, EVENT_ON_FORM_IMAGE_REPOSITIONED,
     EVENT_ON_FORM_IMAGE_SCALE_CHANGED, EVENT_ON_FORM_IMAGE_SELECTED,
     EVENT_ON_FORM_RENDER_REQUEST
 } from "./FormEvents/FormEvents";
@@ -32,6 +32,7 @@ function CanvasComponent({OnImageRepositionRequest})
         document.addEventListener(EVENT_ON_FORM_RENDER_REQUEST, (e) => processImageCollection(e.detail));
         document.addEventListener(EVENT_ON_FORM_IMAGE_SELECTED, (e) =>  onSelectImage(e.detail));
         document.addEventListener(EVENT_ON_FORM_IMAGE_DESELECTED, (e) => onDeselectImage(e.detail));
+        document.addEventListener(EVENT_ON_FORM_IMAGE_REPOSITIONED, (e) => adjustImagePositioning(e.detail));
 
         return() => {
             document.removeEventListener(EVENT_ON_FORM_IMAGE_POS_CHANGED, (e) => translateImage(e.detail));
@@ -39,6 +40,7 @@ function CanvasComponent({OnImageRepositionRequest})
             document.removeEventListener(EVENT_ON_FORM_RENDER_REQUEST, (e) => processImageCollection(e.detail));
             document.removeEventListener(EVENT_ON_FORM_IMAGE_SELECTED, (e) =>  onSelectImage(e.detail));
             document.removeEventListener(EVENT_ON_FORM_IMAGE_DESELECTED, (e) => onDeselectImage(e.detail));
+            document.removeEventListener(EVENT_ON_FORM_IMAGE_REPOSITIONED, (e) => adjustImagePositioning(e.detail));
         }
     }, [canvas]);
 
@@ -67,9 +69,9 @@ function CanvasComponent({OnImageRepositionRequest})
     }
     //#endregion
 
-    useEffect(() => {
-        adjustImagePositioning(OnImageRepositionRequest)
-    }, [OnImageRepositionRequest])
+    // useEffect(() => {
+    //     adjustImagePositioning(OnImageRepositionRequest)
+    // }, [OnImageRepositionRequest])
 
     //#region CANVAS RESIZING
     useEffect(() => {
