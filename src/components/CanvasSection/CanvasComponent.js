@@ -204,6 +204,7 @@ function CanvasComponent({OnImageRepositionRequest,
                     'top',
                     'left'
                 );
+                currentImage.dirty = true;
 
                 CanvasActions.dispatchUpdateImagePosition(canvas, imageID);
 
@@ -240,10 +241,10 @@ function CanvasComponent({OnImageRepositionRequest,
 
                 currentImage.scaleX = scale.x;
                 currentImage.scaleY = scale.y;
-
-                CanvasActions.dispatchUpdateImageScale(canvas, imageID)
-
                 currentImage.dirty = true;
+
+                CanvasActions.dispatchUpdateImageScale(canvas, imageID);
+
                 canvas.renderAll();
             } 
         });
@@ -251,7 +252,7 @@ function CanvasComponent({OnImageRepositionRequest,
 
     function handleProcessImages(){
         if (canvas) {
-            canvas.renderAll();
+            canvas.requestRenderAll();
             const dataURL = canvas.toDataURL('image/png');
             const a = document.createElement('a');
             a.href = dataURL;
@@ -271,8 +272,8 @@ function CanvasComponent({OnImageRepositionRequest,
         canvasImages.map(imageObject => {
             if(imageObject.id === itemID){
                 canvas.setActiveObject(imageObject);
+                imageObject.dirty = true;
             }
-            else {imageObject.dirty = true;}
         })
 
         canvas.renderAll();
