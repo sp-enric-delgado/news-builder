@@ -12,6 +12,10 @@ function ProjectSection(){
         navigate("/canvas", {state:{projectName}});
     }
 
+    function navigateToSpineCanvas(){
+        navigate("/spineCanvas");
+    }
+
     /* ON APP ENTER, FETCH AND LOAD PROJECTS */
     useEffect(() => {
         fetch('http://localhost:3001/projects')
@@ -73,6 +77,10 @@ function ProjectSection(){
 
             <div className="footer">
                 <button onClick={showModal}>Add project...</button>
+            </div>
+
+            <div className="test">
+                <button onClick={() => navigateToSpineCanvas()}>SPINE TEMP BUTTON</button>
             </div>
 
             {isModalOpen && (
