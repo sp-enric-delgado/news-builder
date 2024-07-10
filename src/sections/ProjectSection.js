@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {useNavigate} from 'react-router-dom';
 import CreateProjectModal from "../components/ProjectSection/Modal/CreateProjectModal";
+import {Box, Button, Card, CardContent, Container, Typography,} from "@mui/material";
 
 
 function ProjectSection(){
@@ -47,38 +48,29 @@ function ProjectSection(){
     }
   
     return(
-        <div>
-            <div className="title">
-                <h1>Project Selection</h1>
-            </div>
+        <Container sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+            <Container>
+                <Typography variant="h1">LiveOps Art Tool</Typography>
+            </Container>
 
-            <div className="body">
-                <div className="header">
-                    <h2>Select a project to work with...</h2>
-                </div>
-                <div className="content">
-                    <ul className="content-list">
-                        {
-                            projects.map((item, index) => {
-                                return(
-                                    <li key={index} className="content-element">
-                                        <button key={item} className="content-element-button" onClick={()=>navigateToCanvas(item)}>{item}</button>
-                                    </li>
-                                );
-                            })
-                        }
-                    </ul>
-                </div>
-            </div>
+            <Container sx={{ my: 5 }}>
+                <Card variant="elevation" elevation={3} sx={{display: 'flex', flexDirection: 'row', my: 3, py: 5, justifyContent: "space-evenly", borderRadius: 2, borderWidth: 2, borderColor: "primary.light" }}>
+                    {projects.map((item, index) => (
+                        <CardContent>
+                            <Button variant="outlined" key={index} onClick={()=>navigateToCanvas(item)}>{item}</Button>
+                        </CardContent>
+                    ))}
+                </Card>
+            </Container>
 
-            <div className="footer">
-                <button onClick={showModal}>Add project...</button>
-            </div>
+            <Container>
+                <Button variant="outlined" onClick={showModal}>Add project...</Button>
+            </Container>
 
             {isModalOpen && (
                 <CreateProjectModal setOpenModal={setIsModalOpen} onProjectCreated={handleNewProject}/>
             )}
-        </div>
+        </Container>
     );
 }
 
