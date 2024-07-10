@@ -9,6 +9,7 @@ import {
     EVENT_ON_FORM_IMAGE_SCALE_CHANGED, EVENT_ON_FORM_IMAGE_SELECTED,
     EVENT_ON_FORM_RENDER_REQUEST
 } from "./FormEvents/FormEvents";
+import {Button, Container, Box} from "@mui/material";
 
 function CanvasComponent()
 {
@@ -17,12 +18,6 @@ function CanvasComponent()
 
     const [canvas, setCanvas] = useState(null);
     const canvasRef = useRef();
-
-    const canvasDivStyle = {
-        width: backgroundWidth,
-        height: backgroundHeight
-    };
-
 
     //#region EVENTS
     // Listening to events for when the FORM values change
@@ -297,15 +292,15 @@ function CanvasComponent()
     //#endregion
 
     return(
-        <div className='canvasSection'>
-          <h2>Canvas</h2>
-          
-          <div className='canvasDiv' style={canvasDivStyle}>
-            <canvas ref={canvasRef} className='canvasElement'/>
-          </div>
-
-          <button onClick={handleDownloadImage}>Download Image</button>
-        </div>
+        <Container
+            sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 3}}>
+            <Box sx={{width: backgroundWidth, height: backgroundHeight}}>
+                <canvas ref={canvasRef} className='canvasElement'/>
+            </Box>
+            <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+                <Button variant="outlined" sx={{width: '225px'}} onClick={handleDownloadImage}>Download Image</Button>
+            </Box>
+        </Container>
     );
 }
 
