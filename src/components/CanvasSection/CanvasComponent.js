@@ -295,7 +295,7 @@ function CanvasComponent()
         <Container
             sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 3}}>
             <Box sx={{width: backgroundWidth, height: backgroundHeight}}>
-                <canvas ref={canvasRef} className='canvasElement'/>
+                <canvas ref={canvasRef}/>
             </Box>
             <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
                 <Button variant="outlined" sx={{width: '225px'}} onClick={handleDownloadImage}>Download Image</Button>

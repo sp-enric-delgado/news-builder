@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../../styles/ImageFormComponent.css'
 import {EVENT_ON_CANVAS_GET_IMAGE_POSITION, EVENT_ON_CANVAS_GET_IMAGE_SCALE} from "./CanvasElements/CanvasEvents";
 import * as FormEvent from './FormEvents/FormEvents'
+import {Container, Typography, Box, Button, InputLabel, Input, Card} from "@mui/material";
 
 function ImageFormComponent({ProjectName, Template}) {
 
@@ -34,16 +35,16 @@ function ImageFormComponent({ProjectName, Template}) {
 
     // Fetching the DB  to get the template's data
     useEffect(() => {
-      fetch(`http://localhost:3001/templates?projectName=${encodeURIComponent(ProjectName)}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const currentTemplate = data.filter((item) => item.name === Template);
-        const currentContent = currentTemplate.map((item) => item.content);
-        setTemplateContent(currentContent);
-      })
-      .catch((error) => {
-        console.error("[IMAGE FORM COMPONENT] COULDN'T GET TEMPLATE CONTENT: " + error);
-      });
+        fetch(`http://localhost:3001/templates?projectName=${encodeURIComponent(ProjectName)}`)
+            .then((response) => response.json())
+            .then((data) => {
+                const currentTemplate = data.filter((item) => item.name === Template);
+                const currentContent = currentTemplate.map((item) => item.content);
+                setTemplateContent(currentContent);
+            })
+            .catch((error) => {
+                console.error("[IMAGE FORM COMPONENT] COULDN'T GET TEMPLATE CONTENT: " + error);
+            });
     }, [Template])
 
 
@@ -95,20 +96,20 @@ function ImageFormComponent({ProjectName, Template}) {
     }
 
     function onImageReposition(itemID, positioning){
-      if(itemID === null || itemID === "") return;
+        if(itemID === null || itemID === "") return;
 
-      const repositionData = {
-        "id": itemID,
-        "positioning": positioning
-      }
+        const repositionData = {
+            "id": itemID,
+            "positioning": positioning
+        }
 
-      FormEvent.dispatchEventOnFormImageRepositioned(repositionData);
-    } 
+        FormEvent.dispatchEventOnFormImageRepositioned(repositionData);
+    }
 
     function onImageSelect(itemID){
-      if(itemID === null || itemID === "") return;
+        if(itemID === null || itemID === "") return;
 
-      FormEvent.dispatchEventOnFormImageSelected(itemID);
+        FormEvent.dispatchEventOnFormImageSelected(itemID);
     }
 
     function onImageDeselect(itemID){
@@ -132,121 +133,103 @@ function ImageFormComponent({ProjectName, Template}) {
     }
 
     function generateInputFields() {
-      if (Array.isArray(templateContent) && templateContent.length > 0)
-      {
-        return(
-          <div>
-            <h1>{Template}</h1>
-            {
-              templateContent[0].map((item, index) => {
+        if (Array.isArray(templateContent) && templateContent.length > 0)
+        {
+            return(
+                <Container sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
+                    <Box>
+                        <Typography variant="h2">{Template}</Typography>
+                    </Box>
+                    {
+                        templateContent[0].map((item, index) => {
 
-                return(
-                  <div key={index}>
-                    <div className='element'>
-                      <h3>{item.name}</h3>
-                        <div>
-                          <label htmlFor={item.id}>Image: </label>
-                          <input id={item.id} type='file' accept='*.png' onChange={ (e) => handleImageUpload(e, index)}/>
-                        </div>
-                        { item.id !== "background" && 
-                          <div className='components'>
-                            <div>
-                              <div>
-                                <label htmlFor={item.id + "_x"}>X: </label>
-                                <input id={item.id + "_x"} 
-                                        type='number'
-                                        onChange={(event) => handleImagePositionInput("x", event.target.value, item.id)}
-                                        value={imagePositionDict[item.id]?.x}/>
-                              </div>
-                              <div>
-                                <label htmlFor={item.id + "_y"}>Y: </label>
-                                <input id={item.id + "_y"} 
-                                        type='number'
-                                        onChange={(event) => handleImagePositionInput("y", event.target.value, item.id)}
-                                        value={imagePositionDict[item.id]?.y}/>
-                              </div>
-                            </div>
+                            return(
+                                <Card key={index} sx={{p: 3}}>
+                                    <Typography variant="h3" >{item.name}</Typography>
+                                    <Container sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2}}>
+                                        <InputLabel htmlFor={item.id}>Image: </InputLabel>
+                                        <Input id={item.id} type='file' accept='*.png' onChange={ (e) => handleImageUpload(e, index)}/>
+                                    </Container>
+                                    { item.id !== "background" &&
+                                        <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'left', gap: 2}}>
+                                            <Container>
+                                                <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2}}>
+                                                    <InputLabel htmlFor={item.id + "_x"}>X: </InputLabel>
+                                                    <Input id={item.id + "_x"}
+                                                           type='number'
+                                                           onChange={(event) => handleImagePositionInput("x", event.target.value, item.id)}
+                                                           value={imagePositionDict[item.id]?.x}/>
+                                                </Box>
+                                                <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2}}>
+                                                    <InputLabel htmlFor={item.id + "_y"}>Y: </InputLabel>
+                                                    <Input id={item.id + "_y"}
+                                                           type='number'
+                                                           onChange={(event) => handleImagePositionInput("y", event.target.value, item.id)}
+                                                           value={imagePositionDict[item.id]?.y}/>
+                                                </Box>
+                                            </Container>
 
-                            <div>
-                              <div>
-                                <label htmlFor={item.id + "_scaleX"}>X Scale: </label>
-                                <input id={item.id + "_scaleX"} 
-                                       type='number'
-                                       step="0.1"
-                                       onChange={(event) => handleImageScaleInput("x", event.target.value, item.id)}
-                                       value={imageScaleDict[item.id]?.x}/>
-                              </div>
-                              <div>
-                                <label htmlFor={item.id + "_scaleY"}>Y Scale: </label>
-                                <input id={item.id + "_scaleY"} 
-                                       type='number'
-                                       step="0.1"
-                                       onChange={(event) => handleImageScaleInput("y", event.target.value, item.id)}
-                                       value={imageScaleDict[item.id]?.y}/>
-                              </div>
-                            </div>
+                                            <Container>
+                                                <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2}}>
+                                                    <InputLabel htmlFor={item.id + "_scaleX"}>X Scale: </InputLabel>
+                                                    <Input id={item.id + "_scaleX"}
+                                                           type='number'
+                                                           step="0.1"
+                                                           onChange={(event) => handleImageScaleInput("x", event.target.value, item.id)}
+                                                           value={imageScaleDict[item.id]?.x}/>
+                                                </Box>
+                                                <Box sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2}}>
+                                                    <InputLabel htmlFor={item.id + "_scaleY"}>Y Scale: </InputLabel>
+                                                    <Input id={item.id + "_scaleY"}
+                                                           type='number'
+                                                           step="0.1"
+                                                           onChange={(event) => handleImageScaleInput("y", event.target.value, item.id)}
+                                                           value={imageScaleDict[item.id]?.y}/>
+                                                </Box>
+                                            </Container>
 
-                            <div>
-                              <label htmlFor="layer-buttons">Layer Order</label>
-                              <div id="layer-buttons">
-                                <button onClick={(event) => onImageReposition(item.id, "Forward")}>Bring Forward</button>
-                                <button onClick={(event) => onImageReposition(item.id, "Backwards")}>Bring Backwards</button>
-                              </div>
-                            </div>
+                                            <Container sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2}}>
+                                                <InputLabel htmlFor="layer-buttons">Layer Order</InputLabel>
+                                                <Box id="layer-buttons" sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around'}}>
+                                                    <Button onClick={(event) => onImageReposition(item.id, "Forward")}>Bring Forward</Button>
+                                                    <Button onClick={(event) => onImageReposition(item.id, "Backwards")}>Bring Backwards</Button>
+                                                </Box>
+                                            </Container>
 
-                              <div className='selection-component'>
-                                  <div className='selection-button--container'>
-                                      <label htmlFor="selection-button">Select Object</label>
-                                      <button className="selected" id="selection-button"
-                                              onClick={(event) => onImageSelect(item.id)}>Select
-                                      </button>
-                                  </div>
+                                            <Container  sx={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between'}}>
+                                                <Box>
+                                                    <Button onClick={(event) => onImageSelect(item.id)}>Select Object </Button>
+                                                </Box>
 
-                                  <div className='deselection-button--container'>
-                                      <label htmlFor="deselection-button">Deselect Object</label>
-                                      <button className="selected" id="deselection-button"
-                                              onClick={(event) => onImageDeselect(item.id)}>Deselect
-                                      </button>
-                                  </div>
-
-                              </div>
-
-                              <div>
-
-                              </div>
-                          </div>
-                        }
-                        <div>
-                            <hr/>
-                        </div>
-                    </div>
-                  </div>
-                );
-              })
-            }
-          </div>
-        );
-      } 
-      else
-      {
-        return <div>
-          <h1>Select Template...</h1>
-        </div>;
-      }
+                                                <Box>
+                                                    <Button className="selected" id="deselection-button" onClick={(event) => onImageDeselect(item.id)}>Deselect Object</Button>
+                                                </Box>
+                                            </Container>
+                                        </Box>
+                                    }
+                                </Card>
+                            );
+                        })
+                    }
+                </Container>
+            );
+        }
+        else
+        {
+            return <Container sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <Typography variant="h2">Select a template to start editing</Typography>
+            </Container>;
+        }
     }
 
     return (
-        <div className='content'>
-            <div className='fieldsSection'>
-              <div>
-                {generateInputFields()}
-              </div>
+        <Container sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 3}}>
+            {generateInputFields()}
 
-                <div>
-                    <button onClick={() => FormEvent.dispatchEventOnFormRenderRequest(imageCollection)}> Render </button>
-                </div>
-            </div>
-        </div>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <Button variant="outlined" sx={{width: '225px'}} onClick={() => FormEvent.dispatchEventOnFormRenderRequest(imageCollection)}> Render </Button>
+            </Box>
+        </Container>
     );
 };
 
