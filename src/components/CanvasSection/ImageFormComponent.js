@@ -137,9 +137,6 @@ function ImageFormComponent({ProjectName, Template}) {
         {
             return(
                 <Container sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-                    <Box>
-                        <Typography variant="h2">{Template}</Typography>
-                    </Box>
                     {
                         templateContent[0].map((item, index) => {
 
@@ -224,7 +221,13 @@ function ImageFormComponent({ProjectName, Template}) {
 
     return (
         <Container sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 3}}>
-            {generateInputFields()}
+            <Box>
+                <Typography variant="h2">{Template}</Typography>
+            </Box>
+
+            <Box sx={{maxHeight: "45vh", overflow: 'auto', my:3}}>
+                {generateInputFields()}
+            </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <Button variant="outlined" sx={{width: '225px'}} onClick={() => FormEvent.dispatchEventOnFormRenderRequest(imageCollection)}> Render </Button>
