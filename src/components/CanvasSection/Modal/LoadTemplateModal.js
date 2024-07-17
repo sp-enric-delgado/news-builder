@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import {Modal, Box, Typography, Container, Button} from '@mui/material';
 import { ImCross } from "react-icons/im";
 
 import UploadFileModalSection from './UploadFileModalSection';
@@ -32,25 +33,23 @@ function LoadTemplateModal({setOpenModal, onNewTemplateAdded, projectName}){
 
 
     return(
-        <div className={`modal-bg ${setOpenModal ? 'active' : 'hidden'}`}>
-            <div className="modal-content">
-                <div className="modal-content--closeBtn">
-                    <ImCross className="closeBtn" onClick={() => { setOpenModal(false); }}/>
-                </div>
+        <Modal open={setOpenModal} onClose={() => {setOpenModal(false)}}
+               sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}
+            >
+            <Box sx={{width: .45, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', backgroundColor: 'white', py: 8, borderRadius: 10}}>
+                <Box>
+                    <Typography variant="h2">Upload the template</Typography>
+                </Box>
 
-                <div className='modal-content--header'>
-                    <h1 className='header'>Upload the template</h1>
-                </div>
-
-                <div className='modal-content--uploadArea'>
+                <Box sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                     <UploadFileModalSection onDrop={setTemplate} />
-                </div>
+                </Box>
 
-                <div className='modal-content--uploadButton'>
-                    <button className='uploadButton' onClick={handleDroppedFile}>Upload</button>
-                </div>
-            </div>
-        </div>
+                <Box>
+                    <Button onClick={handleDroppedFile}>Upload</Button>
+                </Box>
+            </Box>
+        </Modal>
     );
 }
 

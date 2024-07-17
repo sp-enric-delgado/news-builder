@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BsFiletypeJson } from "react-icons/bs";
 
 import '../../../styles/Modal/UploadFileModalSection.css';
+import {Box, Container, Input, Typography} from "@mui/material";
 
 function UploadFileModalSection({onDrop}) {
   const [dragOver, setDragOver] = useState(false);
@@ -36,6 +37,18 @@ function UploadFileModalSection({onDrop}) {
   };
 
   return (
+      <Box ondragenter={handleDragEnter} ondragleave={handleDragLeave} ondrop={handleDrop}
+        sx={{display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', my: 3, padding: 5, border: '2px dashed #ccc', borderRadius: '.75em', width: 1, gap: '5rem'}}>
+        <Box>
+          <Typography variant="p">Drag and drop a JavaScript file here, or click to select a file</Typography>
+        </Box>
+
+        <Box >
+          <Input className='fileInput' type='file' accept='*.json' onChange={handleDrop}/>
+        </Box>
+      </Box>
+
+      /*
     <div>
       <div onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDrop={handleDrop} className={`file-dropzone ${dragOver ? 'is-active' : ''}`}>
         <div className='file-dropzone--text'>
@@ -51,8 +64,8 @@ function UploadFileModalSection({onDrop}) {
         </div>
       </div>
     </div>
-
+  */
   );
-};
+}
 
 export default UploadFileModalSection;
