@@ -1,13 +1,11 @@
-import { useCallback, useContext, useEffect, useState } from 'react';
-import { IoIosArrowDropdown } from "react-icons/io";
+import { useEffect, useState } from 'react';
 
 import '../../styles/DropdownComponent.css'
 import LoadTemplateModal from './Modal/LoadTemplateModal';
+import {Button, Container, FormControl, InputLabel, MenuItem, Select} from "@mui/material";
 
 function DropdownComponent({ProjectName, OnSelectedTemplate}) {
-    const [isOpen, setIsOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState('');
     const [newTemplate, setNewTemplate] = useState('');
     const [currentTemplates, setCurrentTemplates] = useState([]);
 
@@ -31,55 +29,30 @@ function DropdownComponent({ProjectName, OnSelectedTemplate}) {
         setNewTemplate(newUploadedTemplate);
     };
 
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    };
-
-    const showModal = () => {
-        setIsModalOpen(true);   
-    }
-
     const handleOptionClick = (option) => {
-        setSelectedOption(option);
         OnSelectedTemplate(option);
-        setIsOpen(false);
     };
 
-    function displayCurrentTemplates(){
-        return currentTemplates.map((name, index) => {
-            return (
-            <ul key={name}>
-                <li key={index} className="option" onClick={() => handleOptionClick(name)}>{name}</li>
-            </ul>
-            );
-        });
-    }
 
     return (
-        <div className="dropdown-container">
-
-            <div className='dropdown-menu'>
-                <p>{selectedOption || 'Select Option...'}</p>
-                <IoIosArrowDropdown className="dropdown-button" onClick={toggleDropdown} />
-            </div>
-
-            {isOpen && (
-                <div key="uniqueID1" className="dropdown-content">
-                    <div key="uniqueID2" className="fixed-button-container">
-                        <button key="uniqueID3" className="fixed-button" onClick={showModal}>Load template</button>
-                    </div>
-                    
-                    <div key="uniqueID4" className="options-container">
-                        {displayCurrentTemplates()}
-                    </div>
-                </div>
-            )}
+        <Container sx={{display: 'flex', justifyContent: 'center', my: 1}}>
+            <FormControl sx={{ width: 0.5}}>
+                <InputLabel id="dropdown">Select Template...</InputLabel>
+                <Select id="dropdown" label="Select Template...">
+                    <Button onClick={() => setIsModalOpen(true)}>Load template</Button>
+                    {
+                        currentTemplates.map((item, index) => (
+                            <MenuItem value={item} onClick={() => handleOptionClick(item)}>{item}</MenuItem>
+                        ))
+                    }
+                </Select>
+            </FormControl>
 
             {isModalOpen && (
                 <LoadTemplateModal setOpenModal={setIsModalOpen} onNewTemplateAdded={handleLoadedTemplate} projectName={ProjectName}/>
             )}
-        </div>
+        </Container>
     );
-  };
+  }
   
 export default DropdownComponent;
